@@ -1,0 +1,15 @@
+torch 
+torchvision 
+torchaudio
+tensorboard 
+matplotlib 
+pyyaml 
+tqdm 
+scipy 
+typing 
+conda-forge::pandas
+torchinfo torchdata
+torchtext
+torchsummary
+wget 
+portalocker
