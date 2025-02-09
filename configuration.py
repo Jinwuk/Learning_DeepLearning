@@ -46,6 +46,9 @@ class configuration:
         self.embedding_dim      = self.fundamental_config['EMBEDDING_DIM']
         self.epoch      = self.fundamental_config['EPOCHS']
 
+        # For CUDA setting
+        self.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+
         # ----------------------------------------------------------------
         # Data Setting
         #----------------------------------------------------------------
@@ -61,11 +64,13 @@ class configuration:
         #----------------------------------------------------------------
         self.data_padding_size  = self.args.data_padding_size
         self.num_workers        = self.args.number_of_workers
+
     # first define a transform function, to turn images into tersors
     def set_data_transform(self):
         self.transform = Transforms.Compose([
                         Transforms.ToTensor(),
                         Transforms.Pad(self.data_padding_size)])
+
 
 # =================================================================
 # Test Routine

@@ -24,9 +24,19 @@ if __name__ == "__main__":
     L_param=[]
     c_conf = configuration(L_param=L_param, _intro_msg=_description)
     c_data = Fashion_MNIST(conf_data=c_conf)
-
+    # ----------------------------------------------------------------
+    # 1. Data setting
+    # ----------------------------------------------------------------
     c_conf.set_data_transform()
     train_loader, test_loader = c_data.get_dataloaders(c_conf.transform)
+    # Check Data Shape
+    print(next(iter(train_loader))[0].shape)
+    # ----------------------------------------------------------------
+    # 2. Network Setting
+    # ----------------------------------------------------------------
+
+
+
 
     print("===================================================")
     print("Process Finished ")
