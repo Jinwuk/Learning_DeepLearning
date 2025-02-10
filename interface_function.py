@@ -36,7 +36,6 @@ def ArgumentParse(L_Param, _prog, _intro_msg=_description, bUseParam=False):
     print(_intro_msg)
     return args
 
-
 def get_source(_work_fullpath):
     with open(_work_fullpath, 'r', encoding='utf-8') as _file:
         _contents = _file.read()
@@ -48,6 +47,9 @@ def read_json(_json_file):
     with open(_json_file, 'r', encoding='utf-8') as _file:
         _dict_data = json.load(_file)
     return _dict_data
+def write_json(_json_file, _data):
+    with open(_json_file, 'w', encoding='utf-8') as _file:
+        json.dump(_data, _file, indent = 4)
 def read_yaml(_yaml_file):
     with open(_yaml_file, 'r',  encoding='utf-8') as _file:
         _config = yaml.safe_load(_file)
@@ -55,6 +57,43 @@ def read_yaml(_yaml_file):
 def write_yaml(_yaml_file, _data):
     with open(_yaml_file, 'w', encoding='utf-8') as _file:
         yaml.dump(_data, _file, default_flow_style=False)
+# ----------------------------------------------------------------
+# Modify YAML or Jason
+# ----------------------------------------------------------------
+def find_dict(d_target, _target_key, _new_value):
+    for _key, _value in d_target.items():
+        if isinstance(d_target.get(_key), dict):
+            find_dict(_value, _target_key=_target_key, _new_value=_new_value)
+        else:
+            if _key == _target_key : d_target[_key] = _new_value
+            else : pass
+    return d_target
+
+def modify_parameter_file(_yaml_or_jason, _file_name, _target_key, _new_value, b_quite=True):
+    if _yaml_or_jason == 'yaml':
+        f_read_parameter_file = read_yaml
+        f_write_parameter_file= write_yaml
+    else:
+        f_read_parameter_file = read_json
+        f_write_parameter_file= write_json
+
+    my_dict = f_read_parameter_file(_file_name)
+
+    if b_quite == False:
+        print("Original Parameters")
+        for _key, _value in my_dict.items():
+            print("%16s : " %_key, _value)
+    else : pass
+
+    my_dict = find_dict(my_dict, _target_key=_target_key, _new_value=_new_value)
+
+    if b_quite == False:
+        print("Updated Parameters")
+        for _key, _value in my_dict.items():
+            print("%16s : " %_key, _value)
+    else: pass
+
+    f_write_parameter_file(_file_name, _data=my_dict)
 
 # =================================================================
 # Main Routine
@@ -62,8 +101,8 @@ def write_yaml(_yaml_file, _data):
 if __name__ == "__main__":
 
     args = ArgumentParse(L_Param=[], _prog=__file__, _intro_msg=_description)
-    _config = read_yaml(args.fundamental_configure_file)
-    print(_config)
+
+    _config = modify_parameter_file(_yaml_or_jason='yaml', _file_name="fundamental_configure.yaml", _target_key="OPTIMIZER", _new_value="SGD", b_quite=False)
 
     print("===================================================")
     print("Process Finished ")
