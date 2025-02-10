@@ -47,30 +47,24 @@ class configuration:
         self.epoch      = self.fundamental_config['EPOCHS']
 
         # For CUDA setting
-        self.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-        # ----------------------------------------------------------------
-        # Data Setting
-        #----------------------------------------------------------------
-        self.transform  = None
-
-        # ----------------------------------------------------------------
-        # Optimizer Setting
-        #----------------------------------------------------------------
-        self.learning_rate = self.fundamental_config['LEARNING_RATE']
-
+        self.fundamental_config['DEVICE'] = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device     = self.fundamental_config['DEVICE']
         # ----------------------------------------------------------------
         # Miscellaneous Setting
         #----------------------------------------------------------------
         self.data_padding_size  = self.args.data_padding_size
         self.num_workers        = self.args.number_of_workers
+        self.quite_mode         = self.args.quite_mode
 
-    # first define a transform function, to turn images into tersors
-    def set_data_transform(self):
-        self.transform = Transforms.Compose([
-                        Transforms.ToTensor(),
-                        Transforms.Pad(self.data_padding_size)])
+        # ----------------------------------------------------------------
+        # Data Setting
+        #----------------------------------------------------------------
+        #self.transform  = self.set_data_transform()
 
+        # ----------------------------------------------------------------
+        # Optimizer Setting
+        #----------------------------------------------------------------
+        self.learning_rate = self.fundamental_config['LEARNING_RATE']
 
 # =================================================================
 # Test Routine

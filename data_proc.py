@@ -20,7 +20,6 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
-
 import torchvision
 import torchvision.transforms as Transforms
 from torchsummary import summary
@@ -32,6 +31,14 @@ class Fashion_MNIST:
         self.work_path      = _work_path
         self.num_workers    = conf_data.num_workers
         self.batch_size     = conf_data.batch_size
+        self.data_padding_size = conf_data.data_padding_size
+
+    # first define a transform function, to turn images into tersors
+    def set_data_transform(self):
+        _transform = Transforms.Compose([
+                        Transforms.ToTensor(),
+                        Transforms.Pad(self.data_padding_size)])
+        return _transform
 
     def get_dataloaders(self, transform):
         print("----------------------------------------------------")

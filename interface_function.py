@@ -28,9 +28,7 @@ def ArgumentParse(L_Param, _prog, _intro_msg=_description, bUseParam=False):
     parser.add_argument('-nw', '--number_of_workers', help="number_of_workers (Default:4)",
                         type=int, default=4)
 
-    parser.add_argument('-rs', '--report_style', action='store_true', help="[gemini_ai] Generate Report Style (Default : False)",
-                        default=False)
-    parser.add_argument('-mq', '--math_question', action='store_true', help="[gemini_ai] Is question a mathematical question (Default : False)",
+    parser.add_argument('-qm', '--quite_mode', action='store_true', help="Quite mode (Default : False)",
                         default=False)
 
     args = parser.parse_args(L_Param) if bUseParam else parser.parse_args()
