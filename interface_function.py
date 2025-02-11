@@ -14,7 +14,8 @@ Example :  There is no Operation instruction.
 '''
 import argparse, textwrap
 import json, yaml
-
+from pathlib import Path
+import my_debug as DBG
 def ArgumentParse(L_Param, _prog, _intro_msg=_description, bUseParam=False):
     parser = argparse.ArgumentParser(
         prog=_prog,
@@ -27,9 +28,10 @@ def ArgumentParse(L_Param, _prog, _intro_msg=_description, bUseParam=False):
                         type=int, default=2)
     parser.add_argument('-nw', '--number_of_workers', help="number_of_workers (Default:4)",
                         type=int, default=4)
-
     parser.add_argument('-qm', '--quite_mode', action='store_true', help="Quite mode (Default : False)",
                         default=False)
+    parser.add_argument('-ot', '--optimizer_spec', help="Optimizer Specification (Default : optimizer.yaml)",
+                        type=str, default='optimizer.yaml')
 
     args = parser.parse_args(L_Param) if bUseParam else parser.parse_args()
 
@@ -69,13 +71,18 @@ def find_dict(d_target, _target_key, _new_value):
             else : pass
     return d_target
 
-def modify_parameter_file(_yaml_or_jason, _file_name, _target_key, _new_value, b_quite=True):
-    if _yaml_or_jason == 'yaml':
+def modify_parameter_file(_file_name, _target_key, _new_value, b_quite=True):
+    _yaml_or_jason = Path(_file_name).suffix
+
+    if _yaml_or_jason == '.yaml':
         f_read_parameter_file = read_yaml
         f_write_parameter_file= write_yaml
-    else:
+    elif _yaml_or_jason == '.json':
         f_read_parameter_file = read_json
         f_write_parameter_file= write_json
+    else:
+        DBG.dbg("Unknown File Format (%s)!!! Program terminated!" %_yaml_or_jason)
+        exit(0)
 
     my_dict = f_read_parameter_file(_file_name)
 
@@ -102,7 +109,7 @@ if __name__ == "__main__":
 
     args = ArgumentParse(L_Param=[], _prog=__file__, _intro_msg=_description)
 
-    _config = modify_parameter_file(_yaml_or_jason='yaml', _file_name="fundamental_configure.yaml", _target_key="OPTIMIZER", _new_value="SGD", b_quite=False)
+    _config = modify_parameter_file(_file_name="fundamental_configure.yaml", _target_key="OPTIMIZER", _new_value="Adam", b_quite=False)
 
     print("===================================================")
     print("Process Finished ")

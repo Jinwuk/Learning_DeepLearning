@@ -10,15 +10,16 @@ _description = '''\
 main_test.py : main_test.py for Generating Deeplearning the 2nd ED 
                     Written by Jinwuk @ 2025-02-09
 ====================================================
-Example :  There is no Operation instruction. 
+Example :  python main_test.py  
 '''
 from configuration import configuration
 from data_proc import Fashion_MNIST
 from model.auto_encoder import Encoder
 from model.auto_encoder import Decoder
 from model.auto_encoder import AutoEncoder
-from torchsummary import summary
-
+from operation import operation_fn
+from report_op import report_AutoEncoder
+import time
 # =================================================================
 # Main Routine
 # =================================================================
@@ -26,27 +27,36 @@ if __name__ == "__main__":
     L_param=[]
     c_conf = configuration(L_param=L_param, _intro_msg=_description)
     c_data = Fashion_MNIST(conf_data=c_conf)
+    c_oper = operation_fn(conf_data=c_conf)
+    c_repo = report_AutoEncoder(conf_data=c_conf, figsize=(8, 8), alpha=0.8, s=3)
     # ----------------------------------------------------------------
-    # 2. Network Setting
+    # 1. Network Setting
     # ----------------------------------------------------------------
-    #c_encoder = Encoder(c_config=c_conf).to(c_conf.device)
-    #summary(c_encoder, (c_conf.channels, c_conf.image_size, c_conf.image_size))
-    #c_decoder = Decoder(c_config=c_conf).to(c_conf.device)
-    #summary(c_decoder, (c_conf.embedding_dim, ))
-
     c_ae = AutoEncoder(c_config=c_conf).to(c_conf.device)
-    summary(c_ae, (c_conf.channels, c_conf.image_size, c_conf.image_size))
-    '''
+    c_ae.print_summary(_shape=(c_conf.channels, c_conf.image_size, c_conf.image_size), _quite=c_conf.args.quite_mode)
+    # Model Setting
+    cf_loss_fn, cf_optimizer = c_conf(model=c_ae)
     # ----------------------------------------------------------------
-    # 1. Data setting
+    # 2. Data setting
     # ----------------------------------------------------------------
-    _data_transform = c_data.set_data_transform()
-    train_loader, test_loader = c_data.get_dataloaders(_data_transform)
-    # Check Data Shape
-    print(next(iter(train_loader))[0].shape)
-    '''
+    train_loader, test_loader   = c_data.get_dataloaders()
 
+    # ----------------------------------------------------------------
+    # 3. Train and Evaluate
+    # ----------------------------------------------------------------
+    start_time = time.time()
 
+    for i in range(c_conf.epoch):
+        train_loss  = c_oper.train(model=c_ae, dataloader=train_loader, optimizer=cf_optimizer, loss_fn=cf_loss_fn)
+        test_loss   = c_oper.validate(model=c_ae, dataloader=test_loader, loss_fn=cf_loss_fn)
+
+        c_oper.record_result(_epoch=i, train_loss=train_loss, test_loss=test_loss)
+
+    elapsed_time = time.time() - start_time
+    # ----------------------------------------------------------------
+    # 4. Report Result
+    # ----------------------------------------------------------------
+    c_repo(model=c_ae, test_loader=test_loader)
 
     print("===================================================")
     print("Process Finished ")

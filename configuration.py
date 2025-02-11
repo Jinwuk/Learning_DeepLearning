@@ -12,9 +12,13 @@ data_proc.py : configuration.py for Generating Deeplearning the 2nd ED
 ====================================================
 Example :  There is no Operation instruction. 
 '''
+g_line      = "----------------------------------------------------"
 
+# ----------------------------------------------------------------
+# Following Libraries are a fundamental requirements
+# However, we employ only partial libraries within those
+# ----------------------------------------------------------------
 import numpy as np
-
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -26,6 +30,7 @@ from matplotlib import pyplot as plt
 
 import os
 import interface_function as IF
+import my_debug as DBG
 class configuration:
     def __init__(self, L_param, _intro_msg=_description, bUseParam=False):
         self.args = IF.ArgumentParse(L_Param=L_param, _prog=__file__, _intro_msg=_intro_msg, bUseParam=bUseParam)
@@ -49,6 +54,9 @@ class configuration:
         # For CUDA setting
         self.fundamental_config['DEVICE'] = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.device     = self.fundamental_config['DEVICE']
+        # For Miscellaneous
+        self.SummaryWriterPATH  = self.fundamental_config['EXPERIMENT_PARAM']['SummaryWriterPATH']
+        self.test_samples       = self.fundamental_config['EXPERIMENT_PARAM']['TEST_SAMPLES']
         # ----------------------------------------------------------------
         # Miscellaneous Setting
         #----------------------------------------------------------------
@@ -64,7 +72,30 @@ class configuration:
         # ----------------------------------------------------------------
         # Optimizer Setting
         #----------------------------------------------------------------
-        self.learning_rate = self.fundamental_config['LEARNING_RATE']
+        s_algorithm_name    = self.fundamental_config['OPERATION_PARAMS']['OPTIMIZER']
+        self.c_optimizer    = getattr(torch.optim, s_algorithm_name)
+        self.learning_rate  = float(self.fundamental_config['LEARNING_RATE'])
+        self.loss_fn_param  = 'mean'
+
+    def __call__(self, model, **kwargs):
+        # ----------------------------------------------------------------
+        # Configure __call__ 함수는 Loss function과 Optimizer Setting에 사용
+        #----------------------------------------------------------------
+        try:
+            cf_loss_fn    = nn.BCEWithLogitsLoss(reduction=self.loss_fn_param)
+            cf_optimizer  = self.c_optimizer(model.parameters(), lr=self.learning_rate)
+        except Exception as e:
+            DBG.dbg("Error : %s \nProgram Terminated !!" %e)
+            exit(0)
+        finally:
+            print(f"Optimizer     : %s.%s" %(self.c_optimizer.__module__, self.c_optimizer.__ne__))
+            print(f" learning_rate: %f" %self.learning_rate)
+            print(f"Loss Function : %s.%s" %(cf_loss_fn.__module__, cf_loss_fn.__ne__))
+            print(f"    parameter : %s" %self.loss_fn_param)
+            print(f"Device for OP : %s" %self.device)
+            print(g_line)
+
+        return cf_loss_fn, cf_optimizer
 
 # =================================================================
 # Test Routine
