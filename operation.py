@@ -39,8 +39,8 @@ class operation_fn:
     
         for i, (train_x, train_y) in enumerate(dataloader):
             optimizer.zero_grad()
-            train_x = train_x.to(DEVICE)
-            recon_x = model(train_x)
+            train_x     = train_x.to(DEVICE)
+            recon_x,    = model(train_x)
             loss = loss_fn(recon_x, train_x)
     
             loss.backward()

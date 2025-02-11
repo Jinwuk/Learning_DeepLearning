@@ -143,9 +143,9 @@ class AutoEncoder(nn.Module):
         self.decoder = Decoder(c_config= c_config)
 
     def forward(self, x):
-        z = self.encoder(x)
-        recon_x = self.decoder(z)
-        return recon_x
+        _encoded = self.encoder(x)
+        _decoded = self.decoder(_encoded)
+        return _decoded, _encoded
 
     def generate(self, z):
         return F.sigmoid(self.decoder(z))

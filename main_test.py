@@ -12,6 +12,8 @@ main_test.py : main_test.py for Generating Deeplearning the 2nd ED
 ====================================================
 Example :  python main_test.py  
 '''
+g_line      = "----------------------------------------------------"
+
 from configuration import configuration
 from data_proc import Fashion_MNIST
 from model.auto_encoder import Encoder
@@ -56,6 +58,7 @@ if __name__ == "__main__":
     # ----------------------------------------------------------------
     # 4. Report Result
     # ----------------------------------------------------------------
+    print(f"Processing Time : {elapsed_time: .2f}")
     c_repo(model=c_ae, test_loader=test_loader)
 
     print("===================================================")
