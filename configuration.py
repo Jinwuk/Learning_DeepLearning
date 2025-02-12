@@ -6,13 +6,13 @@
 # 2025 02 09 by Jinwuk Seok
 ###########################################################################
 _description = '''\
-====================================================
+================================================================
 data_proc.py : configuration.py for Generating Deeplearning the 2nd ED 
                     Written by Jinwuk @ 2025-02-09
-====================================================
+================================================================
 Example :  There is no Operation instruction. 
 '''
-g_line      = "----------------------------------------------------"
+g_line      = "----------------------------------------------------------------"
 
 # ----------------------------------------------------------------
 # Following Libraries are a fundamental requirements
@@ -40,7 +40,7 @@ class configuration:
         self.root_path  = os.getcwd()
         self.model_path = os.path.join(self.root_path, 'model')
         self.lib_path   = os.path.join(self.root_path, 'lib')
-        self.doc_path   = os.path.join(self.root_path, 'lib')
+        self.doc_path   = os.path.join(self.root_path, 'doc')
         # ----------------------------------------------------------------
         # Fundamental Configure
         #----------------------------------------------------------------

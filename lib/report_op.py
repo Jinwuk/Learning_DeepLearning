@@ -9,13 +9,13 @@ import torch
 import my_debug as DBG
 
 _description = '''\
-====================================================
+================================================================
 report_op.py : training and validating for Generating Deeplearning the 2nd ED 
                     Written by Jinwuk @ 2025-02-11
-====================================================
+================================================================
 Example :  There is no Operation instruction. 
 '''
-g_line      = "----------------------------------------------------"
+g_line      = "----------------------------------------------------------------"
 
 import numpy as np
 import os
@@ -31,6 +31,7 @@ class report_AutoEncoder:
         self.c_conf     = conf_data
         self.save_graphic= conf_data.save_graphic
         self.graphic_path= conf_data.doc_path
+        self._count     = 0
         # For Plotting window
         self.figsize    = kwargs['figsize']
         self.alpha      = kwargs['alpha']
@@ -52,7 +53,10 @@ class report_AutoEncoder:
 
     def plt_show_method(self):
         if self.save_graphic:
-            plt.savefig(os.path.join(self.graphic_path, __name__))
+            _file_name  = __name__ + f"_{self._count:d}.png"
+            g_file_name = os.path.join(self.graphic_path, _file_name)
+            plt.savefig(g_file_name)
+            self._count += 1
         else:
             plt.show()
 
@@ -79,6 +83,7 @@ class report_AutoEncoder:
                     c='red',
                     alpha=0.5,
                     s=20)
+        plt.colorbar()
         self.plt_show_method()
 
         # Generate new images from sampled embeddings

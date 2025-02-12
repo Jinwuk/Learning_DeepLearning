@@ -6,10 +6,10 @@
 # 2025 02 09 by Jinwuk Seok
 ###########################################################################
 _description = '''\
-====================================================
+================================================================
 interface_function.py : configuration.py for Generating Deeplearning the 2nd ED 
                     Written by Jinwuk @ 2025-02-09
-====================================================
+================================================================
 Example :  There is no Operation instruction. 
 '''
 import argparse, textwrap
