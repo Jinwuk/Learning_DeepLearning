@@ -6,6 +6,7 @@
 # 2025 02 09 by Jinwuk Seok
 ###########################################################################
 import torch
+import my_debug as DBG
 
 _description = '''\
 ====================================================
@@ -17,6 +18,7 @@ Example :  There is no Operation instruction.
 g_line      = "----------------------------------------------------"
 
 import numpy as np
+import os
 from matplotlib import pyplot as plt
 class report_AutoEncoder:
     def __init__(self, conf_data, c_op, **kwargs):
@@ -27,6 +29,8 @@ class report_AutoEncoder:
         # Data for plotting
         self.c_op       = c_op
         self.c_conf     = conf_data
+        self.save_graphic= conf_data.save_graphic
+        self.graphic_path= conf_data.doc
         # For Plotting window
         self.figsize    = kwargs['figsize']
         self.alpha      = kwargs['alpha']
@@ -46,15 +50,22 @@ class report_AutoEncoder:
         else:
             print("No operation for report")
 
+    def plt_show_method(self):
+        if self.save_graphic:
+            plt.savefig(os.path.join(self.graphic_path, __name__))
+        else:
+            plt.show()
+
     def plot_embeds_and_labels(self, output_embs, output_labels):
         _x = output_embs[:, 0]
         _y = output_embs[:, 1]
         _class = output_labels
+
         plt.figure(figsize=self.figsize)
         plt.scatter( _x, _y, c=_class,
                     alpha=self.alpha, s=self.s)
         plt.colorbar()
-        plt.show()
+        self.plt_show_method()
 
     def plot_samples_and_recon_images(self, output_embs, output_labels, samples, output_imgs):
         plt.figure(figsize=(6, 6))
@@ -68,7 +79,7 @@ class report_AutoEncoder:
                     c='red',
                     alpha=0.5,
                     s=20)
-        plt.show()
+        self.plt_show_method()
 
         # Generate new images from sampled embeddings
         fig, axes = plt.subplots(nrows=3, ncols=6, figsize=(10, 6))
@@ -81,4 +92,4 @@ class report_AutoEncoder:
             ax.axis('off')
             ax.imshow(output_imgs[i], cmap='gray')
 
-        plt.show()
+        self.plt_show_method()

@@ -34,6 +34,8 @@ def ArgumentParse(L_Param, _prog, _intro_msg=_description, bUseParam=False):
                         default=False)
     parser.add_argument('-ot', '--optimizer_spec', help="Optimizer Specification (Default : optimizer.yaml)",
                         type=str, default='optimizer.yaml')
+    parser.add_argument('-sg', '--save_graphic', action='store_true', help="Save graphics Not use plt.show (Default : False)",
+                        default=False)
 
     args = parser.parse_args(L_Param) if bUseParam else parser.parse_args()
 

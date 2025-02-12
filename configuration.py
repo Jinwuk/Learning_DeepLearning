@@ -40,6 +40,7 @@ class configuration:
         self.root_path  = os.getcwd()
         self.model_path = os.path.join(self.root_path, 'model')
         self.lib_path   = os.path.join(self.root_path, 'lib')
+        self.doc_path = os.path.join(self.root_path, 'lib')
         # ----------------------------------------------------------------
         # Fundamental Configure
         #----------------------------------------------------------------
@@ -85,7 +86,7 @@ class configuration:
         self.data_padding_size  = self.args.data_padding_size
         self.num_workers        = self.args.number_of_workers
         self.quite_mode         = self.args.quite_mode
-
+        self.save_graphic       = self.args.save_graphic
     def __call__(self, model, **kwargs):
         # ----------------------------------------------------------------
         # Configure __call__ 함수는 Loss function과 Optimizer Setting에 사용
