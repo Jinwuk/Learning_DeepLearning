@@ -30,7 +30,7 @@ class report_AutoEncoder:
         self.c_op       = c_op
         self.c_conf     = conf_data
         self.save_graphic= conf_data.save_graphic
-        self.graphic_path= conf_data.doc
+        self.graphic_path= conf_data.doc_path
         # For Plotting window
         self.figsize    = kwargs['figsize']
         self.alpha      = kwargs['alpha']

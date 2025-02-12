@@ -40,7 +40,7 @@ class configuration:
         self.root_path  = os.getcwd()
         self.model_path = os.path.join(self.root_path, 'model')
         self.lib_path   = os.path.join(self.root_path, 'lib')
-        self.doc_path = os.path.join(self.root_path, 'lib')
+        self.doc_path   = os.path.join(self.root_path, 'lib')
         # ----------------------------------------------------------------
         # Fundamental Configure
         #----------------------------------------------------------------
