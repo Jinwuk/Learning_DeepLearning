@@ -42,7 +42,7 @@ class Fashion_MNIST:
         return _transform
 
     def get_dataloaders(self):
-        print("Load Fashion MNIST Data \n", g_line)
+        print("Load Fashion MNIST Data\n" + g_line)
         # Set data Transform
         transform = self.set_data_transform()
         # load MNIST dataset

@@ -30,6 +30,8 @@ def ArgumentParse(L_Param, _prog, _intro_msg=_description, bUseParam=False):
                         type=int, default=4)
     parser.add_argument('-qm', '--quite_mode', action='store_true', help="Quite mode (Default : False)",
                         default=False)
+    parser.add_argument('-im', '--inference_mode', action='store_true', help="Inference mode (Default : False)",
+                        default=False)
     parser.add_argument('-ot', '--optimizer_spec', help="Optimizer Specification (Default : optimizer.yaml)",
                         type=str, default='optimizer.yaml')
 

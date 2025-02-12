@@ -28,54 +28,63 @@ import torchvision.transforms as Transforms
 from torchsummary import summary
 from matplotlib import pyplot as plt
 
-import os
-import interface_function as IF
-import my_debug as DBG
+import os, sys
+import lib.interface_function as IF
+import lib.my_debug as DBG
 class configuration:
     def __init__(self, L_param, _intro_msg=_description, bUseParam=False):
         self.args = IF.ArgumentParse(L_Param=L_param, _prog=__file__, _intro_msg=_intro_msg, bUseParam=bUseParam)
         # ----------------------------------------------------------------
         # Path and File
         #----------------------------------------------------------------
-        self.work_path  = os.getcwd()
-        #self.work_fullpath = os.path.join(self.work_path, self.work_file)
+        self.root_path  = os.getcwd()
+        self.model_path = os.path.join(self.root_path, 'model')
+        self.lib_path   = os.path.join(self.root_path, 'lib')
         # ----------------------------------------------------------------
         # Fundamental Configure
         #----------------------------------------------------------------
         self.fundamental_config = IF.read_yaml(self.args.fundamental_configure_file)
-        self.image_size = self.fundamental_config['IMAGE_SIZE']
-        self.channels   = self.fundamental_config['CHANNELS']
-        self.batch_size = self.fundamental_config['BATCH_SIZE']
-        self.buffer_size= self.fundamental_config['BUFFER_SIZE']
-        self.validation_split   = self.fundamental_config['VALIDATION_SPLIT']
-        self.embedding_dim      = self.fundamental_config['EMBEDDING_DIM']
-        self.epoch      = self.fundamental_config['EPOCHS']
 
+        self.embedding_dim = self.fundamental_config['OP_SPEC']['EMBEDDING_DIM']
+        self.epoch      = self.fundamental_config['OP_SPEC']['EPOCHS']
+        self.buffer_size = self.fundamental_config['OP_SPEC']['BUFFER_SIZE']
+        self.validation_split = self.fundamental_config['OP_SPEC']['VALIDATION_SPLIT']
+        self.image_size = self.fundamental_config['DATASPEC']['IMAGE_SIZE']
+        self.channels   = self.fundamental_config['DATASPEC']['CHANNELS']
+        self.batch_size = self.fundamental_config['DATASPEC']['BATCH_SIZE']
         # For CUDA setting
         self.fundamental_config['DEVICE'] = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.device     = self.fundamental_config['DEVICE']
         # For Miscellaneous
         self.SummaryWriterPATH  = self.fundamental_config['EXPERIMENT_PARAM']['SummaryWriterPATH']
         self.test_samples       = self.fundamental_config['EXPERIMENT_PARAM']['TEST_SAMPLES']
+        self.model_file         = self.fundamental_config['EXPERIMENT_PARAM']['MODEL_FILE']
+        # ----------------------------------------------------------------
+        # Optimizer Setting
+        #----------------------------------------------------------------
+        s_algorithm_name    = self.fundamental_config['LEARNING_PARAMS']['OPTIMIZER']
+        self.c_optimizer    = getattr(torch.optim, s_algorithm_name)
+        self.learning_rate  = float(self.fundamental_config['LEARNING_PARAMS']['LEARNING_RATE'])
+        self.loss_fn_param  = self.fundamental_config['LEARNING_PARAMS']['LOSS_PARAM']
+        # ----------------------------------------------------------------
+        # Operation Mode Setting
+        #----------------------------------------------------------------
+        if self.args.inference_mode:
+            if os.path.exists(self.model_file):
+                self.loaded_model = torch.load(self.model_file)
+                _op_msg = "Inference mode"
+            else:
+                _op_msg = "Operation of inference mode is impossible. \nThere is not any saved model file"
+                self.args.inference_mode = False
+        else:
+            _op_msg = "Normal learning mode"
+        print(_op_msg + "\n" + g_line)
         # ----------------------------------------------------------------
         # Miscellaneous Setting
         #----------------------------------------------------------------
         self.data_padding_size  = self.args.data_padding_size
         self.num_workers        = self.args.number_of_workers
         self.quite_mode         = self.args.quite_mode
-
-        # ----------------------------------------------------------------
-        # Data Setting
-        #----------------------------------------------------------------
-        #self.transform  = self.set_data_transform()
-
-        # ----------------------------------------------------------------
-        # Optimizer Setting
-        #----------------------------------------------------------------
-        s_algorithm_name    = self.fundamental_config['OPERATION_PARAMS']['OPTIMIZER']
-        self.c_optimizer    = getattr(torch.optim, s_algorithm_name)
-        self.learning_rate  = float(self.fundamental_config['LEARNING_RATE'])
-        self.loss_fn_param  = 'mean'
 
     def __call__(self, model, **kwargs):
         # ----------------------------------------------------------------

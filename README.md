@@ -18,3 +18,11 @@ import torchvision.transforms as Transforms
 from torchsummary import summary
 from matplotlib import pyplot as plt
 ~~~
+
+
+
+## Tensorboard 사용법
+- 가급적 별도의 command 혹은 conda 창을 띄워서 사용한다.
+~~~
+tensorboard --logdir=runs
+~~~

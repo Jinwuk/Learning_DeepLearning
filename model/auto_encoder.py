@@ -17,7 +17,7 @@ g_line      = "----------------------------------------------------"
 from torch import nn
 from torch.nn import functional as F
 from torchsummary import summary
-import my_debug as DBG
+import lib.my_debug as DBG
 # Encoder
 
 # ----------------------------------------------------------------
@@ -44,7 +44,7 @@ class Encoder(nn.Module):
         #----------------------------------------------------------------
         # Fundamental Spec
         #----------------------------------------------------------------
-        _data_ch = c_config.fundamental_config['CHANNELS']
+        _data_ch     = c_config.fundamental_config['DATASPEC']['CHANNELS']
         _kernel_size = c_config.fundamental_config['NETWORK_PARAMS']['KERNEL']
         _stride      = c_config.fundamental_config['NETWORK_PARAMS']['STRIDE']
         _features    = c_config.fundamental_config['NETWORK_PARAMS']['FEATURES']
@@ -91,7 +91,7 @@ class Decoder(nn.Module):
         #----------------------------------------------------------------
         # Fundamental Spec
         #----------------------------------------------------------------
-        _data_ch     = c_config.fundamental_config['CHANNELS']
+        _data_ch     = c_config.fundamental_config['DATASPEC']['CHANNELS']
         _kernel_size = c_config.fundamental_config['NETWORK_PARAMS']['KERNEL']
         _stride      = c_config.fundamental_config['NETWORK_PARAMS']['STRIDE']
         _features    = c_config.fundamental_config['NETWORK_PARAMS']['FEATURES']
@@ -155,6 +155,11 @@ class AutoEncoder(nn.Module):
         if _quite == False:
             summary(self, _shape)
         else: pass
+# ----------------------------------------------------------------
+# Sub Classes : Full Connected Network
+# ----------------------------------------------------------------
+
+
 
 # =================================================================
 # Main Routine

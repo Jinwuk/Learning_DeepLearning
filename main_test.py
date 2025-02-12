@@ -14,13 +14,20 @@ Example :  python main_test.py
 '''
 g_line      = "----------------------------------------------------"
 
+import os, sys
+root_path   = os.getcwd()
+model_path  = os.path.join(root_path, 'model')
+lib_path    = os.path.join(root_path, 'lib')
+sys.path.append(os.path.join(root_path, model_path))
+sys.path.append(os.path.join(root_path, lib_path))
+
 from configuration import configuration
-from data_proc import Fashion_MNIST
+from lib.data_proc import Fashion_MNIST
 from model.auto_encoder import Encoder
 from model.auto_encoder import Decoder
 from model.auto_encoder import AutoEncoder
-from operation import operation_fn
-from report_op import report_AutoEncoder
+from lib.operation import operation_fn
+from lib.report_op import report_AutoEncoder
 import time
 # =================================================================
 # Main Routine
@@ -30,7 +37,7 @@ if __name__ == "__main__":
     c_conf = configuration(L_param=L_param, _intro_msg=_description)
     c_data = Fashion_MNIST(conf_data=c_conf)
     c_oper = operation_fn(conf_data=c_conf)
-    c_repo = report_AutoEncoder(conf_data=c_conf, figsize=(8, 8), alpha=0.8, s=3)
+    c_repo = report_AutoEncoder(conf_data=c_conf, c_op=c_oper, figsize=(8, 8), alpha=0.8, s=3)
     # ----------------------------------------------------------------
     # 1. Network Setting
     # ----------------------------------------------------------------
@@ -42,23 +49,28 @@ if __name__ == "__main__":
     # 2. Data setting
     # ----------------------------------------------------------------
     train_loader, test_loader   = c_data.get_dataloaders()
-
     # ----------------------------------------------------------------
     # 3. Train and Evaluate
     # ----------------------------------------------------------------
     start_time = time.time()
-
-    for i in range(c_conf.epoch):
-        train_loss  = c_oper.train(model=c_ae, dataloader=train_loader, optimizer=cf_optimizer, loss_fn=cf_loss_fn)
+    if c_conf.args.inference_mode :
+        # Only evaluation processing (Verify)
+        c_ae.load_state_dict(c_conf.loaded_model)
+        train_loss  = c_oper.validate(model=c_ae, dataloader=train_loader, loss_fn=cf_loss_fn)
         test_loss   = c_oper.validate(model=c_ae, dataloader=test_loader, loss_fn=cf_loss_fn)
-
-        c_oper.record_result(_epoch=i, train_loss=train_loss, test_loss=test_loss)
+        print(f'Epoch 0  ', "Train/loss", f"{train_loss:.4f}   ", "Valid/loss", f"{test_loss:.4f}")
+    else:
+        # Normal Learning processing
+        for i in range(c_conf.epoch):
+            train_loss  = c_oper.train(model=c_ae, dataloader=train_loader, optimizer=cf_optimizer, loss_fn=cf_loss_fn)
+            test_loss   = c_oper.validate(model=c_ae, dataloader=test_loader, loss_fn=cf_loss_fn)
+            c_oper.record_result(_epoch=i, train_loss=train_loss, test_loss=test_loss)
 
     elapsed_time = time.time() - start_time
     # ----------------------------------------------------------------
     # 4. Report Result
     # ----------------------------------------------------------------
-    print(f"Processing Time : {elapsed_time: .2f}")
+    print(f"\nProcessing Time : {elapsed_time: .2f} sec")
     c_repo(model=c_ae, test_loader=test_loader)
 
     print("===================================================")
