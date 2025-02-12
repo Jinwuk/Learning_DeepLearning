@@ -158,13 +158,35 @@ class AutoEncoder(nn.Module):
 # ----------------------------------------------------------------
 # Sub Classes : Full Connected Network
 # ----------------------------------------------------------------
+class Classifier_for_autoencoder(nn.Module):
+    def __init__(self, c_config):
+        super().__init__()
+        self.input_dim  = c_config.embedding_dim
+        self.output_dim = len(c_config.data_label)
+        self.n_hidden   = c_config.hidden_lyr
 
+        self.model = nn.Sequential(
+            nn.Linear(self.input_dim, self.n_hidden),
+            nn.ReLU(),
+            nn.Linear(self.n_hidden, self.n_hidden),
+            nn.ReLU(),
+            nn.Linear(self.n_hidden, self.output_dim)
+        )
+    def forward(self, x):
+        _z      = self.model(x)
+        _output = nn.Softmax(_z)
+        return _output, _z
+
+    def print_summary(self, _shape, _quite=True):
+        if _quite == False:
+            summary(self, _shape)
+        else: pass
 
 
 # =================================================================
 # Main Routine
 # =================================================================
-import interface_function as IF
+import lib.interface_function as IF
 
 if __name__ == "__main__":
     c_conf = None

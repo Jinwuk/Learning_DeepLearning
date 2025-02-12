@@ -24,6 +24,8 @@ def ArgumentParse(L_Param, _prog, _intro_msg=_description, bUseParam=False):
 
     parser.add_argument('-fc', '--fundamental_configure_file', help="fundamental_configure_file",
                         type=str, default='fundamental_configure.yaml')
+    parser.add_argument('-lf', '--label_file', help="Label File for Data (Default : data_label.yaml)",
+                        type=str, default='data_label.yaml')
     parser.add_argument('-dp', '--data_padding_size', help="data padding size (Default:2)",
                         type=int, default=2)
     parser.add_argument('-nw', '--number_of_workers', help="number_of_workers (Default:4)",

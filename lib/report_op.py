@@ -98,3 +98,19 @@ class report_AutoEncoder:
             ax.imshow(output_imgs[i], cmap='gray')
 
         self.plt_show_method()
+
+class report_Classfier_for_AutoEncoder:
+    def __init__(self, conf_data, c_op, **kwargs):
+        #----------------------------------------------------
+        # Spec of kwargs
+        # figsize=(8, 8), alpha=0.8, s=3
+        # ----------------------------------------------------
+        # Data for plotting
+        self.c_op       = c_op
+        self.c_conf     = conf_data
+        self._count     = 0
+
+    def __call__(self, model, test_loader, _mode=1):
+        # 1. Save Learned model
+        torch.save(model.state_dict(), self.c_conf.model_file)
+        # 2. print classification result

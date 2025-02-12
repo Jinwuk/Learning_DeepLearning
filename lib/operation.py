@@ -76,6 +76,63 @@ class operation_fn:
     
             test_loss += loss
         return test_loss / len(dataloader)
+
+    #----------------------------------------------------
+    # Train Classifier
+    #----------------------------------------------------
+    def train_classifier(self, l_model, dataloader, optimizer, loss_fn):
+        # ----------------------------------------------------
+        # Train Setting
+        # ----------------------------------------------------
+        DEVICE      = self.c_config.device
+        ae_model    = l_model[0]
+        cf_model    = l_model[1]
+        # ----------------------------------------------------
+        # Main routine
+        # ----------------------------------------------------
+        cf_model.train()
+        train_loss = 0
+
+        for i, (train_x, train_y) in enumerate(dataloader):
+            optimizer.zero_grad()
+            train_x     = train_x.to(DEVICE)
+            _, latent   = ae_model(train_x)
+            # block the gradient propagation
+            latent_x    = latent.detach()
+            recon_x, _  = cf_model(latent_x)
+            loss = loss_fn(recon_x, train_x)
+
+            loss.backward()
+            optimizer.step()
+
+            train_loss += loss.item()
+
+        return train_loss / len(dataloader)
+    #----------------------------------------------------
+    # Validate Classifier
+    #----------------------------------------------------
+    def validate_classifier(self, l_model, dataloader, loss_fn):
+        # ----------------------------------------------------
+        # Train Setting
+        # ----------------------------------------------------
+        DEVICE = self.c_config.device
+        ae_model    = l_model[0]
+        cf_model    = l_model[1]
+        # ----------------------------------------------------
+        # Main routine
+        # ----------------------------------------------------
+        cf_model.eval()
+        test_loss = 0
+        for i, (test_x, test_y) in enumerate(dataloader):
+            test_x = test_x.to(DEVICE)
+            with torch.no_grad():
+                _, latent_x = ae_model(test_x)
+                recon_x, _  = cf_model(latent_x)
+                loss = loss_fn(recon_x, test_x)
+
+            test_loss += loss
+        return test_loss / len(dataloader)
+
     #----------------------------------------------------
     # Generate Images
     #----------------------------------------------------

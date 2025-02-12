@@ -20,3 +20,5 @@ EXPERIMENT_PARAM:
   SummaryWriterPATH: .\runs\experiment_1
   TEST_SAMPLES: 5000
   MODEL_FILE: autoencoder_model.pth
+CLASSIFIER:
+  HIDDEN: 64

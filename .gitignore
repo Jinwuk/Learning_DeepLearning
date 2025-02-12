@@ -7,3 +7,6 @@ runs
 lib\__pycache__
 model\__pycache__
 # File
+doc\lib.report_op_0.png
+doc\lib.report_op_1.png
+autoencoder_model.pth

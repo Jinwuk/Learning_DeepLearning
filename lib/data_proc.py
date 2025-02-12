@@ -16,24 +16,20 @@ g_line      = "----------------------------------------------------------------"
 
 import numpy as np
 
-import torch
-from torch import nn
-from torch.nn import functional as F
 from torch.utils.data import DataLoader
 import torchvision
 import torchvision.transforms as Transforms
-from torchsummary import summary
-from matplotlib import pyplot as plt
-
+import interface_function as IF
 import my_debug as DBG
 
 class Fashion_MNIST:
-    def __init__(self, conf_data, _work_path='./data'):
-        self.work_path      = _work_path
+    def __init__(self, conf_data):
+        self.work_path      = conf_data.data_path
         self.num_workers    = conf_data.num_workers
         self.batch_size     = conf_data.batch_size
         self.data_padding_size = conf_data.data_padding_size
         self.data_shape     = None
+
     # first define a transform function, to turn images into tersors
     def set_data_transform(self):
         _transform = Transforms.Compose([

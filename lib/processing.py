@@ -3,59 +3,37 @@
 ###########################################################################
 # O'Reilly Generating Deeplearning the 2nd ED.
 # Working Directory : ..\work_2025
+# 여기에서의 함수는 이미 main_test에서 테스트가 끝난 함수를 보관하기 위해서이다.
 # 2025 02 09 by Jinwuk Seok
 ###########################################################################
 _description = '''\
 ================================================================
-main_test.py : main_test.py for Generating Deeplearning the 2nd ED 
+processing.py : processing.py for Generating Deeplearning the 2nd ED 
                     Written by Jinwuk @ 2025-02-09
 ================================================================
 Example :  python main_test.py  
 '''
 g_line      = "----------------------------------------------------------------"
 
-import os, sys
-root_path   = os.getcwd()
-model_path  = os.path.join(root_path, 'model')
-lib_path    = os.path.join(root_path, 'lib')
-sys.path.append(os.path.join(root_path, model_path))
-sys.path.append(os.path.join(root_path, lib_path))
-
 from configuration import configuration
 from lib.data_proc import Fashion_MNIST
 from model.auto_encoder import AutoEncoder
-from model.auto_encoder import Classifier_for_autoencoder
 from lib.operation import operation_fn
-from lib.report_op import report_Classfier_for_AutoEncoder
-import lib.processing as proc
+from lib.report_op import report_AutoEncoder
 import time
 
-# =================================================================
-# Main Routine
-# =================================================================
-if __name__ == "__main__":
-    L_param=[]
-    #proc.standard_autoencoder_proc(L_param=L_param, _intro_msg=_description)
-    # ----------------------------------------------------------------
-    # 0. Network Setting
-    #----------------------------------------------------------------
-    c_conf = configuration(L_param=L_param, _intro_msg=_description)
+def standard_autoencoder_proc(L_param, _intro_msg=_description):
+    c_conf = configuration(L_param=L_param, _intro_msg=_intro_msg)
     c_data = Fashion_MNIST(conf_data=c_conf)
     c_oper = operation_fn(conf_data=c_conf)
-    c_repo = report_Classfier_for_AutoEncoder(conf_data=c_conf, c_op=c_oper)
+    c_repo = report_AutoEncoder(conf_data=c_conf, c_op=c_oper, figsize=(8, 8), alpha=0.8, s=3)
     # ----------------------------------------------------------------
     # 1. Network Setting
     # ----------------------------------------------------------------
     c_ae = AutoEncoder(c_config=c_conf).to(c_conf.device)
-    c_cf = Classifier_for_autoencoder(c_config=c_conf).to(c_conf.device)
     c_ae.print_summary(_shape=(c_conf.channels, c_conf.image_size, c_conf.image_size), _quite=c_conf.args.quite_mode)
-    c_cf.print_summary(_shape=(1, 2), _quite=c_conf.args.quite_mode)
     # Model Setting
-    ae_loss_fn, ae_optimizer = c_conf(model=c_ae)
-    cf_loss_fn, cf_optimizer = c_conf(model=c_cf)
-    lc_model = []
-    lc_model.append(c_ae)
-    lc_model.append(c_cf)
+    cf_loss_fn, cf_optimizer = c_conf(model=c_ae)
     # ----------------------------------------------------------------
     # 2. Data setting
     # ----------------------------------------------------------------
@@ -63,8 +41,6 @@ if __name__ == "__main__":
     # ----------------------------------------------------------------
     # 3. Train and Evaluate
     # ----------------------------------------------------------------
-    # 3.1 Load AutoEncdoer model
-    c_ae.load_state_dict(c_conf.loaded_model)
     start_time = time.time()
     if c_conf.args.inference_mode :
         # Only evaluation processing (Verify)
@@ -73,12 +49,10 @@ if __name__ == "__main__":
         test_loss   = c_oper.validate(model=c_ae, dataloader=test_loader, loss_fn=cf_loss_fn)
         print(f'Epoch 0  ', "Train/loss", f"{train_loss:.4f}   ", "Valid/loss", f"{test_loss:.4f}")
     else:
-        # 1. Normal AutoLearning processing
+        # Normal Learning processing
         for i in range(c_conf.epoch):
-            train_loss  = c_oper.train_classifier(l_model=lc_model, dataloader=train_loader,
-                                                  optimizer=cf_optimizer, loss_fn=cf_loss_fn)
-            test_loss   = c_oper.validate_classifier(l_model=lc_model, dataloader=test_loader,
-                                                     loss_fn=cf_loss_fn)
+            train_loss  = c_oper.train(model=c_ae, dataloader=train_loader, optimizer=cf_optimizer, loss_fn=cf_loss_fn)
+            test_loss   = c_oper.validate(model=c_ae, dataloader=test_loader, loss_fn=cf_loss_fn)
             c_oper.record_result(_epoch=i, train_loss=train_loss, test_loss=test_loss)
 
     elapsed_time = time.time() - start_time
@@ -86,10 +60,5 @@ if __name__ == "__main__":
     # 4. Report Result
     # ----------------------------------------------------------------
     print(f"\nProcessing Time : {elapsed_time: .2f} sec")
-    c_repo(model=c_cf, test_loader=test_loader)
+    c_repo(model=c_ae, test_loader=test_loader)
 
-
-
-    print("===================================================")
-    print("Process Finished ")
-    print("===================================================")

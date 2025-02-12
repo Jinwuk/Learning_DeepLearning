@@ -41,6 +41,7 @@ class configuration:
         self.model_path = os.path.join(self.root_path, 'model')
         self.lib_path   = os.path.join(self.root_path, 'lib')
         self.doc_path   = os.path.join(self.root_path, 'doc')
+        self.data_path  = os.path.join(self.root_path, 'data')
         # ----------------------------------------------------------------
         # Fundamental Configure
         #----------------------------------------------------------------
@@ -53,6 +54,7 @@ class configuration:
         self.image_size = self.fundamental_config['DATASPEC']['IMAGE_SIZE']
         self.channels   = self.fundamental_config['DATASPEC']['CHANNELS']
         self.batch_size = self.fundamental_config['DATASPEC']['BATCH_SIZE']
+        self.hidden_lyr = self.fundamental_config['CLASSIFIER']['HIDDEN']
         # For CUDA setting
         self.fundamental_config['DEVICE'] = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.device     = self.fundamental_config['DEVICE']
@@ -70,19 +72,18 @@ class configuration:
         # ----------------------------------------------------------------
         # Operation Mode Setting
         #----------------------------------------------------------------
-        if self.args.inference_mode:
-            if os.path.exists(self.model_file):
-                self.loaded_model = torch.load(self.model_file)
-                _op_msg = "Inference mode"
-            else:
-                _op_msg = "Operation of inference mode is impossible. \nThere is not any saved model file"
-                self.args.inference_mode = False
+        if os.path.exists(self.model_file):
+            self.loaded_model = torch.load(self.model_file)
         else:
-            _op_msg = "Normal learning mode"
+            _op_msg = "Operation of inference mode is impossible. \nThere is not any saved model file"
+            self.args.inference_mode = False
+        _op_msg = "Inference mode" if self.args.inference_mode else "Normal learning mode"
         print(_op_msg + "\n" + g_line)
         # ----------------------------------------------------------------
         # Miscellaneous Setting
         #----------------------------------------------------------------
+        self.label_path         = os.path.join(self.root_path, self.args.label_file)
+        self.data_label         = IF.read_yaml(self.label_path)
         self.data_padding_size  = self.args.data_padding_size
         self.num_workers        = self.args.number_of_workers
         self.quite_mode         = self.args.quite_mode
@@ -91,13 +92,22 @@ class configuration:
         # ----------------------------------------------------------------
         # Configure __call__ 함수는 Loss function과 Optimizer Setting에 사용
         #----------------------------------------------------------------
+        _model_name = model.__class__.__name__
         try:
-            cf_loss_fn    = nn.BCEWithLogitsLoss(reduction=self.loss_fn_param)
-            cf_optimizer  = self.c_optimizer(model.parameters(), lr=self.learning_rate)
+            if _model_name == 'AutoEncoder':
+                cf_loss_fn    = nn.BCEWithLogitsLoss(reduction=self.loss_fn_param)
+                cf_optimizer  = self.c_optimizer(model.parameters(), lr=self.learning_rate)
+            elif _model_name == 'Classifier_for_autoencoder':
+                cf_loss_fn    = nn.CrossEntropyLoss()
+                cf_optimizer  = self.c_optimizer(model.parameters(), lr=self.learning_rate)
+            else:
+                DBG.dbg("Model has not been specified. It is error")
+                exit(0)
         except Exception as e:
             DBG.dbg("Error : %s \nProgram Terminated !!" %e)
             exit(0)
         finally:
+            print(f"Model Name    : %s" %_model_name)
             print(f"Optimizer     : %s.%s" %(self.c_optimizer.__module__, self.c_optimizer.__ne__))
             print(f" learning_rate: %f" %self.learning_rate)
             print(f"Loss Function : %s.%s" %(cf_loss_fn.__module__, cf_loss_fn.__ne__))
