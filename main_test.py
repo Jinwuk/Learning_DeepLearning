@@ -71,10 +71,12 @@ if __name__ == "__main__":
     start_time = time.time()
     if c_conf.args.inference_mode :
         # Only evaluation processing (Verify)
-        c_cf.load_state_dict(c_conf.loaded_model)
-        train_loss  = c_oper.validate(model=c_ae, dataloader=train_loader, loss_fn=cf_loss_fn)
-        test_loss   = c_oper.validate(model=c_ae, dataloader=test_loader, loss_fn=cf_loss_fn)
-        print(f'Epoch 0  ', "Train/loss", f"{train_loss:.4f}   ", "Valid/loss", f"{test_loss:.4f}")
+        c_cf.load_state_dict(c_conf.loaded_cf_model)
+        train_loss, _correct_tr= c_oper.validate_classifier(l_model=lc_model, dataloader=train_loader, loss_fn=cf_loss_fn)
+        test_loss,  _correct_te= c_oper.validate_classifier(l_model=lc_model, dataloader=test_loader, loss_fn=cf_loss_fn)
+
+        print(f"Train/loss  {train_loss:.4f} Valid/loss {test_loss:.4f} Correct_TR {_correct_tr:.4f} Correct_TE {_correct_te:.4f}")
+        print("OK")
     else:
         # 1. Normal AutoLearning processing
         for i in range(c_conf.epoch):

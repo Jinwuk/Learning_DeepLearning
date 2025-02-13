@@ -111,8 +111,8 @@ class report_AutoEncoder:
 
             if _exist_kwargs:
                 _test_idx, _pred_idx = int(test_y[i]), int(pred_y[i])
-                _msg_str  = f"{i:2d} ({samples[i][0]:3.1f}, {samples[i][1]:3.1f}) {test_y[i]:2d}  {pred_y[i]:2d}"
-                _msg_str += f"| {self.data_label[_test_idx]}  {self.data_label[_pred_idx]}"
+                _msg_str  = f"{i:2d} ({samples[i][0]:5.1f}, {samples[i][1]:5.1f}) {test_y[i]:2d}  {pred_y[i]:2d}"
+                _msg_str += f"| {self.data_label[_test_idx]:11s}  {self.data_label[_pred_idx]:11s}"
                 print(_msg_str)
             else: pass
         self.plt_show_method()

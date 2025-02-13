@@ -75,12 +75,14 @@ class configuration:
         # ----------------------------------------------------------------
         # Operation Mode Setting
         #----------------------------------------------------------------
-        if os.path.exists(self.model_file):
-            self.loaded_model = torch.load(self.model_file)
-        else:
+        try:
+            self.loaded_model   = torch.load(self.model_file)
+            self.loaded_cf_model= torch.load(self.model_file_classfier)
+            _op_msg = "Inference mode"
+        except Exception as e:
             _op_msg = "Operation of inference mode is impossible. \nThere is not any saved model file"
+            _op_msg+= f"\n Error : {e}"
             self.args.inference_mode = False
-        _op_msg = "Inference mode" if self.args.inference_mode else "Normal learning mode"
         print(_op_msg + "\n" + g_line)
         # ----------------------------------------------------------------
         # Miscellaneous Setting
