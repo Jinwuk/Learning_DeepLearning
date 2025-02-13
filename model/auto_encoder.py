@@ -173,15 +173,13 @@ class Classifier_for_autoencoder(nn.Module):
             nn.Linear(self.n_hidden, self.output_dim)
         )
     def forward(self, x):
-        _z      = self.model(x)
-        _output = nn.Softmax(_z)
-        return _output, _z
+        _output = self.model(x)
+        return _output
 
     def print_summary(self, _shape, _quite=True):
         if _quite == False:
             summary(self, _shape)
         else: pass
-
 
 # =================================================================
 # Main Routine

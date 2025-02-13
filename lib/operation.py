@@ -28,6 +28,9 @@ class operation_fn:
         self.device         = conf_data.device
         self.output_embs    = None
         self.output_labels  = None
+        # sample data for example
+        self.sample_classinfo= {}
+
     # ----------------------------------------------------
     # A single epoch train funcion
     # ----------------------------------------------------
@@ -84,27 +87,31 @@ class operation_fn:
         # ----------------------------------------------------
         # Train Setting
         # ----------------------------------------------------
-        DEVICE      = self.c_config.device
-        ae_model    = l_model[0]
-        cf_model    = l_model[1]
+        DEVICE              = self.c_config.device
+        correct_preds       = 0
+        total_preds         = 0
+        ae_model, cf_model  = l_model[0], l_model[1]
         # ----------------------------------------------------
         # Main routine
         # ----------------------------------------------------
         cf_model.train()
-        train_loss = 0
+        train_loss = 0.0
 
         for i, (train_x, train_y) in enumerate(dataloader):
             optimizer.zero_grad()
-            train_x     = train_x.to(DEVICE)
+            train_x, train_y = train_x.to(DEVICE), train_y.to(DEVICE)
+            # Get Latent of AutoEncoder
             _, latent   = ae_model(train_x)
             # block the gradient propagation
             latent_x    = latent.detach()
-            recon_x, _  = cf_model(latent_x)
-            loss = loss_fn(recon_x, train_x)
+            pred_y      = cf_model(latent_x)
+            loss = loss_fn(pred_y, train_y)
 
             loss.backward()
             optimizer.step()
 
+            correct_preds += sum(pred_y.argmax(dim=-1) == train_y).item()
+            total_preds += len(pred_y)
             train_loss += loss.item()
 
         return train_loss / len(dataloader)
@@ -116,22 +123,30 @@ class operation_fn:
         # Train Setting
         # ----------------------------------------------------
         DEVICE = self.c_config.device
-        ae_model    = l_model[0]
-        cf_model    = l_model[1]
+        total_preds, correct_preds = 0, 0
+        ae_model, cf_model = l_model[0], l_model[1]
         # ----------------------------------------------------
         # Main routine
         # ----------------------------------------------------
         cf_model.eval()
         test_loss = 0
         for i, (test_x, test_y) in enumerate(dataloader):
-            test_x = test_x.to(DEVICE)
+            test_x, test_y = test_x.to(DEVICE), test_y.to(DEVICE)
             with torch.no_grad():
                 _, latent_x = ae_model(test_x)
-                recon_x, _  = cf_model(latent_x)
-                loss = loss_fn(recon_x, test_x)
+                modelout_y  = cf_model(latent_x)        #dim(modelout_y) = [128, 10] 128 samples in batch, 10 out nodes
+                loss = loss_fn(modelout_y, test_y)
 
-            test_loss += loss
-        return test_loss / len(dataloader)
+            pred_y          = modelout_y.argmax(dim=-1) #dim(pred_y) = [128] only 1 out-nodes index of 10 out nodes.
+            test_loss       += loss.item()
+            correct_preds   += sum(pred_y == test_y).item() #dim(test_y)=[128]
+            total_preds     += len(pred_y)
+            # samples of classification result (for first 128 samples)
+            if i == 0:
+                self.sample_classinfo= {'test_y': test_y, 'pred_y': pred_y}
+            else: pass
+
+        return test_loss / len(dataloader), correct_preds / total_preds
 
     #----------------------------------------------------
     # Generate Images
@@ -175,13 +190,22 @@ class operation_fn:
     #----------------------------------------------------
     # Record and print the result to each epoch
     #----------------------------------------------------
-    def record_result(self, _epoch, train_loss, test_loss):
+    def record_result(self, _epoch, train_loss, test_loss, **kwargs):
         s_train_loss = "Train/loss"
         s_valid_loss = "Valid/loss"
         self.writer.add_scalar(s_train_loss, train_loss, _epoch)
         self.writer.add_scalar(s_valid_loss, test_loss, _epoch)
-
-        print(f'Epoch {_epoch + 1: 3d}  ', s_train_loss, f"{train_loss:.4f}   ", s_valid_loss, f"{test_loss:.4f}")
+        #----------------------------------------------------
+        # **kwargs correct = _correct
+        # ----------------------------------------------------
+        if len(kwargs) > 0 :
+            s_correctness= "Correct"
+            _correctness = kwargs['correct']
+            self.writer.add_scalar(s_correctness, _correctness, _epoch)
+            print(f'Epoch {_epoch + 1: 3d}  ', s_train_loss, f"{train_loss:.4f} ",
+              s_valid_loss, f"{test_loss:.4f}", s_correctness, f"{_correctness:.4f}")
+        else:
+            print(f'Epoch {_epoch + 1: 3d}  ', s_train_loss, f"{train_loss:.4f} ", s_valid_loss, f"{test_loss:.4f}")
 
     def save_model_parameter(self, model, _file_name):
         torch.save(model.state.dict(), _file_name)

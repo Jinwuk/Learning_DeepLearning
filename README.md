@@ -43,4 +43,27 @@ Fashion MNIST Data를 Pytorch 를 사용하여 읽어들이면 다음의 Dimensi
 ~~~bash
 [data index, channel, x, y] = [18, 1, 32, 32]
 ~~~
-그러므로 
+그러므로 다음의 transpose를 통해 출력 Dimension이 다음이 되도록 한다.
+~~~
+[0, 2, 3, 1] -> [18, 32, 32, 1]
+~~~
+
+## Test 및 Debug
+일반적인 전체 코드 테스트를 위해서라면 다음과 같이 해야 한다.
+~~~bash
+python main_test.py 
+~~~
+그러나, 일부 기능의 정상적인 수행을 테스트 하기 위해서라면 다음과 같이 arg를 주는 것이 시간 절약을 위해 좋다. 
+~~~bash
+python main_test.py -sg -im
+~~~
+
+
+
+## Developing Memo
+### sys.append(path)
+- python에서 개발 디렉토리 구성을 위해 만들어 놓은 path 구조를 sys.path.append를 통해 등록하게 되면 이후 프로그램이 수행되어도 등록이 추가되거나 하지 않는다.
+
+### summary와 forward
+summary 를 구하기 위해 한번 pytorch는 전체 구조를 forward 하여 Dimension을 구한다.
+따라서 model의 forward 함수가 호출된다.

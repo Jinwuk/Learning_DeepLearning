@@ -26,6 +26,7 @@ from lib.data_proc import Fashion_MNIST
 from model.auto_encoder import AutoEncoder
 from model.auto_encoder import Classifier_for_autoencoder
 from lib.operation import operation_fn
+from lib.report_op import report_AutoEncoder
 from lib.report_op import report_Classfier_for_AutoEncoder
 import lib.processing as proc
 import time
@@ -36,20 +37,22 @@ import time
 if __name__ == "__main__":
     L_param=[]
     #proc.standard_autoencoder_proc(L_param=L_param, _intro_msg=_description)
+
     # ----------------------------------------------------------------
     # 0. Network Setting
     #----------------------------------------------------------------
     c_conf = configuration(L_param=L_param, _intro_msg=_description)
     c_data = Fashion_MNIST(conf_data=c_conf)
     c_oper = operation_fn(conf_data=c_conf)
-    c_repo = report_Classfier_for_AutoEncoder(conf_data=c_conf, c_op=c_oper)
+    _c_ae_repo = report_AutoEncoder(conf_data=c_conf, c_op=c_oper, figsize=(8, 8), alpha=0.8, s=3)
+    c_repo = report_Classfier_for_AutoEncoder(conf_data=c_conf, c_op=c_oper, ae_repo=_c_ae_repo)
     # ----------------------------------------------------------------
     # 1. Network Setting
     # ----------------------------------------------------------------
     c_ae = AutoEncoder(c_config=c_conf).to(c_conf.device)
     c_cf = Classifier_for_autoencoder(c_config=c_conf).to(c_conf.device)
     c_ae.print_summary(_shape=(c_conf.channels, c_conf.image_size, c_conf.image_size), _quite=c_conf.args.quite_mode)
-    c_cf.print_summary(_shape=(1, 2), _quite=c_conf.args.quite_mode)
+    c_cf.print_summary(_shape=(1, c_conf.embedding_dim), _quite=c_conf.args.quite_mode)
     # Model Setting
     ae_loss_fn, ae_optimizer = c_conf(model=c_ae)
     cf_loss_fn, cf_optimizer = c_conf(model=c_cf)
@@ -68,26 +71,24 @@ if __name__ == "__main__":
     start_time = time.time()
     if c_conf.args.inference_mode :
         # Only evaluation processing (Verify)
-        c_ae.load_state_dict(c_conf.loaded_model)
+        c_cf.load_state_dict(c_conf.loaded_model)
         train_loss  = c_oper.validate(model=c_ae, dataloader=train_loader, loss_fn=cf_loss_fn)
         test_loss   = c_oper.validate(model=c_ae, dataloader=test_loader, loss_fn=cf_loss_fn)
         print(f'Epoch 0  ', "Train/loss", f"{train_loss:.4f}   ", "Valid/loss", f"{test_loss:.4f}")
     else:
         # 1. Normal AutoLearning processing
         for i in range(c_conf.epoch):
-            train_loss  = c_oper.train_classifier(l_model=lc_model, dataloader=train_loader,
+            train_loss          = c_oper.train_classifier(l_model=lc_model, dataloader=train_loader,
                                                   optimizer=cf_optimizer, loss_fn=cf_loss_fn)
-            test_loss   = c_oper.validate_classifier(l_model=lc_model, dataloader=test_loader,
-                                                     loss_fn=cf_loss_fn)
-            c_oper.record_result(_epoch=i, train_loss=train_loss, test_loss=test_loss)
+            test_loss, _correct = c_oper.validate_classifier(l_model=lc_model, dataloader=test_loader, loss_fn=cf_loss_fn)
+            c_oper.record_result(_epoch=i, train_loss=train_loss, test_loss=test_loss, correct=_correct)
 
     elapsed_time = time.time() - start_time
     # ----------------------------------------------------------------
     # 4. Report Result
     # ----------------------------------------------------------------
     print(f"\nProcessing Time : {elapsed_time: .2f} sec")
-    c_repo(model=c_cf, test_loader=test_loader)
-
+    c_repo(l_model=lc_model, test_loader=test_loader, c_result=c_oper.sample_classinfo)
 
 
     print("===================================================")

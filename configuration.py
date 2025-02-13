@@ -47,21 +47,24 @@ class configuration:
         #----------------------------------------------------------------
         self.fundamental_config = IF.read_yaml(self.args.fundamental_configure_file)
 
-        self.embedding_dim = self.fundamental_config['OP_SPEC']['EMBEDDING_DIM']
-        self.epoch      = self.fundamental_config['OP_SPEC']['EPOCHS']
-        self.buffer_size = self.fundamental_config['OP_SPEC']['BUFFER_SIZE']
-        self.validation_split = self.fundamental_config['OP_SPEC']['VALIDATION_SPLIT']
-        self.image_size = self.fundamental_config['DATASPEC']['IMAGE_SIZE']
-        self.channels   = self.fundamental_config['DATASPEC']['CHANNELS']
-        self.batch_size = self.fundamental_config['DATASPEC']['BATCH_SIZE']
-        self.hidden_lyr = self.fundamental_config['CLASSIFIER']['HIDDEN']
+        self.embedding_dim      = self.fundamental_config['OP_SPEC']['EMBEDDING_DIM']
+        self.epoch              = self.fundamental_config['OP_SPEC']['EPOCHS']
+        self.buffer_size        = self.fundamental_config['OP_SPEC']['BUFFER_SIZE']
+        self.validation_split   = self.fundamental_config['OP_SPEC']['VALIDATION_SPLIT']
+        self.image_size         = self.fundamental_config['DATASPEC']['IMAGE_SIZE']
+        self.channels           = self.fundamental_config['DATASPEC']['CHANNELS']
+        self.batch_size         = self.fundamental_config['DATASPEC']['BATCH_SIZE']
         # For CUDA setting
         self.fundamental_config['DEVICE'] = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.device     = self.fundamental_config['DEVICE']
+        self.device             = self.fundamental_config['DEVICE']
+        # Additional Model
+        self.hidden_lyr         = self.fundamental_config['CLASSIFIER']['HIDDEN']
+        self.model_file_classfier = self.fundamental_config['CLASSIFIER']['MODEL_FILE']
         # For Miscellaneous
         self.SummaryWriterPATH  = self.fundamental_config['EXPERIMENT_PARAM']['SummaryWriterPATH']
         self.test_samples       = self.fundamental_config['EXPERIMENT_PARAM']['TEST_SAMPLES']
         self.model_file         = self.fundamental_config['EXPERIMENT_PARAM']['MODEL_FILE']
+
         # ----------------------------------------------------------------
         # Optimizer Setting
         #----------------------------------------------------------------

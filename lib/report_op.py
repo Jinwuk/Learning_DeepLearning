@@ -32,6 +32,7 @@ class report_AutoEncoder:
         self.save_graphic= conf_data.save_graphic
         self.graphic_path= conf_data.doc_path
         self._count     = 0
+        self.data_label = conf_data.data_label
         # For Plotting window
         self.figsize    = kwargs['figsize']
         self.alpha      = kwargs['alpha']
@@ -71,7 +72,14 @@ class report_AutoEncoder:
         plt.colorbar()
         self.plt_show_method()
 
-    def plot_samples_and_recon_images(self, output_embs, output_labels, samples, output_imgs):
+    def plot_samples_and_recon_images(self, output_embs, output_labels, samples, output_imgs, **kwargs):
+        # Processing of kwargs
+        _exist_kwargs = True if 'c_result' in kwargs else False
+        if _exist_kwargs:
+            c_result        = kwargs['c_result']
+            test_y, pred_y  = c_result['test_y'], c_result['pred_y']
+        else : pass
+        # First scattering Data 5000
         plt.figure(figsize=(6, 6))
         plt.scatter(output_embs[:, 0],
                     output_embs[:, 1],
@@ -86,6 +94,10 @@ class report_AutoEncoder:
         plt.colorbar()
         self.plt_show_method()
 
+        # processing for kwargs
+        if _exist_kwargs:
+            print(f" index   test           prediction")
+        else: pass
         # Generate new images from sampled embeddings
         fig, axes = plt.subplots(nrows=3, ncols=6, figsize=(10, 6))
         for i in range(output_imgs.shape[0]):
@@ -93,24 +105,41 @@ class report_AutoEncoder:
             curr_col = i % 6
             ax = axes[curr_row, curr_col]
 
-            ax.set_title(f'({samples[i][0]:.1f}, {samples[i][1]:.1f})')
+            ax.set_title(f'({i:2d}: {samples[i][0]:.1f}, {samples[i][1]:.1f})')
             ax.axis('off')
             ax.imshow(output_imgs[i], cmap='gray')
 
+            if _exist_kwargs:
+                _test_idx, _pred_idx = int(test_y[i]), int(pred_y[i])
+                _msg_str  = f"{i:2d} ({samples[i][0]:3.1f}, {samples[i][1]:3.1f}) {test_y[i]:2d}  {pred_y[i]:2d}"
+                _msg_str += f"| {self.data_label[_test_idx]}  {self.data_label[_pred_idx]}"
+                print(_msg_str)
+            else: pass
         self.plt_show_method()
 
 class report_Classfier_for_AutoEncoder:
     def __init__(self, conf_data, c_op, **kwargs):
         #----------------------------------------------------
         # Spec of kwargs
-        # figsize=(8, 8), alpha=0.8, s=3
+        # ae_repo = AutoEncoder class
         # ----------------------------------------------------
+        # kwargs
+        self.ae_repo = kwargs['ae_repo']
         # Data for plotting
         self.c_op       = c_op
         self.c_conf     = conf_data
         self._count     = 0
-
-    def __call__(self, model, test_loader, _mode=1):
+    def __call__(self, l_model, test_loader, **kwargs):
+        #----------------------------------------------------
+        # Spec of kwargs
+        # ----------------------------------------------------
+        ae_model, cf_model  = l_model[0], l_model[1]
+        c_result            = kwargs['c_result']
         # 1. Save Learned model
-        torch.save(model.state_dict(), self.c_conf.model_file)
+        torch.save(cf_model.state_dict(), self.c_conf.model_file_classfier)
         # 2. print classification result
+        output_embs, output_labels  = self.c_op.generate_embeds_and_labels(model=ae_model, test_loader=test_loader)
+        samples, output_imgs        = self.c_op.generate_samples(c_config=self.c_conf, model=ae_model, output_embs=output_embs)
+
+        self.ae_repo.plot_samples_and_recon_images(output_embs=output_embs, output_labels=output_labels,
+                                               samples=samples, output_imgs=output_imgs, c_result=c_result)
