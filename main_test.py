@@ -37,8 +37,11 @@ import time
 if __name__ == "__main__":
     L_param= []
     c_conf = configuration(L_param=L_param, _intro_msg=_description)
-    if c_conf.args.processing_mode == 1:
-        proc.standard_autoencoder_proc(c_conf=c_conf, _intro_msg=_description)
+    if c_conf.args.processing_mode > 0:
+        proc_function = []
+        proc_function.append(proc.standard_autoencoder_proc)
+        proc_function.append(proc.autoencoder_classfication)
+        proc_function[c_conf.args.processing_mode](c_conf=c_conf, _intro_msg=_description)
         sys.exit()
     else: pass
     # ----------------------------------------------------------------

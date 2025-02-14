@@ -60,6 +60,7 @@ class configuration:
         self.test_samples       = self.fundamental_config['EXPERIMENT_PARAM']['TEST_SAMPLES']
         self.model_file         = self.fundamental_config['EXPERIMENT_PARAM']['MODEL_FILE']
         self.summary_text       = self.fundamental_config['EXPERIMENT_PARAM']['SUMMARYTXT']
+        self.text_write_mode    = self.fundamental_config['EXPERIMENT_PARAM']['TEXTWRITEMODE']
         # ----------------------------------------------------------------
         # Optimizer Setting
         #----------------------------------------------------------------
@@ -173,7 +174,7 @@ class configuration:
         for k, _str in enumerate(self.l_proc_msg):
             _content += (_str + '\n')
         _content += g_line
-        IF.put_result(_outfile=self.summary_text, _contents=_content)
+        IF.put_result(_outfile=self.summary_text, _contents=_content, _mode=self.text_write_mode)
 # =================================================================
 # Test Routine
 # =================================================================

@@ -68,8 +68,8 @@ def get_source(_work_fullpath):
     with open(_work_fullpath, 'r', encoding='utf-8') as _file:
         _contents = _file.read()
     return _contents
-def put_result(_outfile, _contents):
-    with open(_outfile, 'w', encoding='utf-8') as _file:
+def put_result(_outfile, _contents, _mode='w'):
+    with open(_outfile, _mode, encoding='utf-8') as _file:
          _file.write(_contents)
 def read_json(_json_file):
     with open(_json_file, 'r', encoding='utf-8') as _file:
