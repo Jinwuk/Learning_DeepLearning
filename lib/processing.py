@@ -49,7 +49,7 @@ def standard_autoencoder_proc(c_conf, _intro_msg=_description, **kwargs):
         c_ae.load_state_dict(c_conf.loaded_model)
         train_loss  = c_oper.validate(model=c_ae, dataloader=train_loader, loss_fn=cf_loss_fn)
         test_loss   = c_oper.validate(model=c_ae, dataloader=test_loader, loss_fn=cf_loss_fn)
-        print(f'Epoch 0  ', "Train/loss", f"{train_loss:.4f}   ", "Valid/loss", f"{test_loss:.4f}")
+        c_conf.pprint(f'Epoch 0  ', "Train/loss", f"{train_loss:.4f}   ", "Valid/loss", f"{test_loss:.4f}")
     else:
         # Normal Learning processing
         for i in range(c_conf.epoch):
@@ -61,14 +61,14 @@ def standard_autoencoder_proc(c_conf, _intro_msg=_description, **kwargs):
     # ----------------------------------------------------------------
     # 4. Report Result
     # ----------------------------------------------------------------
-    print(f"\nProcessing Time : {elapsed_time: .2f} sec")
+    c_conf.pprint(f"\nProcessing Time : {elapsed_time: .2f} sec")
     # ----------------------------------------------------------------
     _msg = f"\n{__name__} : Save graphics mode. Please wait\n" if c_conf.args.save_graphic else f"\n{__name__} : Please Check Window\n"
     print(g_line + _msg + g_line)
     # ----------------------------------------------------------------
     c_repo(model=c_ae, test_loader=test_loader)
     c_conf.write_txt_result()
-    
+
     print("===================================================")
     print("Process Finished ")
     print("===================================================")

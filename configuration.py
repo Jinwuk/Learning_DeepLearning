@@ -172,6 +172,7 @@ class configuration:
         _content = ''
         for k, _str in enumerate(self.l_proc_msg):
             _content += (_str + '\n')
+        _content += g_line
         IF.put_result(_outfile=self.summary_text, _contents=_content)
 # =================================================================
 # Test Routine
