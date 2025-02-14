@@ -192,21 +192,17 @@ class operation_fn:
     # Record and print the result to each epoch
     #----------------------------------------------------
     def record_result(self, _epoch, train_loss, test_loss, **kwargs):
-        s_train_loss = "Train/loss"
-        s_valid_loss = "Valid/loss"
-        self.writer.add_scalar(s_train_loss, train_loss, _epoch)
-        self.writer.add_scalar(s_valid_loss, test_loss, _epoch)
+        self.writer.add_scalar("Train/loss", train_loss, _epoch)
+        self.writer.add_scalar("Valid/loss", test_loss, _epoch)
         #----------------------------------------------------
         # **kwargs correct = _correct
         # ----------------------------------------------------
         if len(kwargs) > 0 :
-            s_correctness= "Correct"
             _correctness = kwargs['correct']
-            self.writer.add_scalar(s_correctness, _correctness, _epoch)
-            print(f'Epoch {_epoch + 1: 3d}  ', s_train_loss, f"{train_loss:.4f} ",
-              s_valid_loss, f"{test_loss:.4f}", s_correctness, f"{_correctness:.4f}")
+            self.writer.add_scalar("Correct", _correctness, _epoch)
+            self.c_config.pprint(f"Epoch {_epoch + 1: 3d}  Train/loss  {train_loss:.4f}  Valid/loss  {test_loss:.4f}  Correct  {_correctness:.4f}")
         else:
-            print(f'Epoch {_epoch + 1: 3d}  ', s_train_loss, f"{train_loss:.4f} ", s_valid_loss, f"{test_loss:.4f}")
+            self.c_config.pprint(f"Epoch {_epoch + 1: 3d}  Train/loss  {train_loss:.4f}  Valid/loss  {test_loss:.4f}")
 
     def save_model_parameter(self, model, _file_name):
         torch.save(model.state.dict(), _file_name)

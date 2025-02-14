@@ -61,6 +61,7 @@ if __name__ == "__main__":
     lc_model = []
     lc_model.append(c_ae)
     lc_model.append(c_cf)
+
     # ----------------------------------------------------------------
     # 2. Data setting
     # ----------------------------------------------------------------
@@ -96,7 +97,7 @@ if __name__ == "__main__":
     print(g_line + _msg + g_line)
     # ----------------------------------------------------------------
     c_repo(l_model=lc_model, test_loader=test_loader, c_result=c_oper.sample_classinfo)
-    del c_conf
+    c_conf.write_txt_result()
 
     print("===================================================")
     print("Process Finished ")

@@ -106,20 +106,16 @@ class configuration:
             DBG.dbg("Error : %s \nProgram Terminated !!" %e)
             exit(0)
         finally:
-            print(f"Model Name    : %s" %_model_name)
-            print(f"Optimizer     : %s.%s" %(self.c_optimizer.__module__, self.c_optimizer.__ne__))
-            print(f" learning_rate: %f" %self.learning_rate)
-            print(f"Loss Function : %s.%s" %(cf_loss_fn.__module__, cf_loss_fn.__ne__))
-            print(f"    parameter : %s" %self.loss_fn_param)
-            print(f"Device for OP : %s" %self.device)
-            print(g_line)
+            self.pprint(f"Model Name    : %s" %_model_name)
+            self.pprint(f"Optimizer     : %s.%s" %(self.c_optimizer.__module__, self.c_optimizer.__ne__))
+            self.pprint(f" learning_rate: %f" %self.learning_rate)
+            self.pprint(f"Loss Function : %s.%s" %(cf_loss_fn.__module__, cf_loss_fn.__ne__))
+            self.pprint(f"    parameter : %s" %self.loss_fn_param)
+            self.pprint(f"Device for OP : %s" %self.device)
+            self.pprint(g_line)
 
         return cf_loss_fn, cf_optimizer
 
-    def __del__(self):
-        DBG.dbg("Debug Begin")
-        IF.put_result(_outfile=self.summary_text, _contents=self.l_proc_msg)
-        self.l_proc_msg.clear()
     #----------------------------------------------------------------
     # Internal Service
     #----------------------------------------------------------------
@@ -172,6 +168,11 @@ class configuration:
         else:
             pass
 
+    def write_txt_result(self):
+        _content = ''
+        for k, _str in enumerate(self.l_proc_msg):
+            _content += (_str + '\n')
+        IF.put_result(_outfile=self.summary_text, _contents=_content)
 # =================================================================
 # Test Routine
 # =================================================================

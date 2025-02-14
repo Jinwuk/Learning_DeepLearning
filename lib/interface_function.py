@@ -36,7 +36,7 @@ def ArgumentParse(L_Param, _prog, _intro_msg=_description, bUseParam=False):
                         help='''\
                         Processing Mode [0] Developing [1] AutoEncoder [2] AutoEncoder+Classifier \n
                         [3] VAE [4] VAE+Classifier (Default : 0)"
-                        ''', type=int, default=2)
+                        ''', type=int, default=0)
     parser.add_argument('-lf', '--label_file',
                         help="Label File for Data            (Default : data_label.yaml)",
                         type=str, default='data_label.yaml')

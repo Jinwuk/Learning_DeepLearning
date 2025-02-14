@@ -67,7 +67,8 @@ def standard_autoencoder_proc(c_conf, _intro_msg=_description, **kwargs):
     print(g_line + _msg + g_line)
     # ----------------------------------------------------------------
     c_repo(model=c_ae, test_loader=test_loader)
-
+    c_conf.write_txt_result()
+    
     print("===================================================")
     print("Process Finished ")
     print("===================================================")

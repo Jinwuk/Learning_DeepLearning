@@ -9,5 +9,6 @@ model/__pycache__
 # File
 autoencoder_model.pth
 classifier_model.pth
+summary_text.txt
 doc/lib.report_op_0.png
 doc/lib.report_op_1.png
