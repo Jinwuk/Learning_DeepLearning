@@ -35,7 +35,7 @@ import time
 # Main Routine
 # =================================================================
 if __name__ == "__main__":
-    L_param=[]
+    L_param= []
     c_conf = configuration(L_param=L_param, _intro_msg=_description)
     if c_conf.args.processing_mode == 1:
         proc.standard_autoencoder_proc(c_conf=c_conf, _intro_msg=_description)
@@ -77,8 +77,7 @@ if __name__ == "__main__":
         train_loss, _correct_tr= c_oper.validate_classifier(l_model=lc_model, dataloader=train_loader, loss_fn=cf_loss_fn)
         test_loss,  _correct_te= c_oper.validate_classifier(l_model=lc_model, dataloader=test_loader, loss_fn=cf_loss_fn)
 
-        print(f"Train/loss  {train_loss:.4f} Valid/loss {test_loss:.4f} Correct_TR {_correct_tr:.4f} Correct_TE {_correct_te:.4f}")
-        print("OK")
+        c_conf.pprint(f"Train/loss  {train_loss:.4f} Valid/loss {test_loss:.4f} Correct_TR {_correct_tr:.4f} Correct_TE {_correct_te:.4f}")
     else:
         # 1. Normal AutoLearning processing
         for i in range(c_conf.epoch):
@@ -91,12 +90,13 @@ if __name__ == "__main__":
     # ----------------------------------------------------------------
     # 4. Report Result
     # ----------------------------------------------------------------
-    print(f"\nProcessing Time : {elapsed_time: .2f} sec")
+    c_conf.pprint(f"\nProcessing Time : {elapsed_time: .2f} sec")
     # ----------------------------------------------------------------
-    print(g_line + f"\n{__name__} : Please Check Window\n" + g_line)
+    _msg  = f"\n{__name__} : Save graphics mode. Please wait\n" if c_conf.args.save_graphic else f"\n{__name__} : Please Check Window\n"
+    print(g_line + _msg + g_line)
     # ----------------------------------------------------------------
     c_repo(l_model=lc_model, test_loader=test_loader, c_result=c_oper.sample_classinfo)
-
+    del c_conf
 
     print("===================================================")
     print("Process Finished ")

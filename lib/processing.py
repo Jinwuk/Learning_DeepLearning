@@ -22,7 +22,7 @@ from lib.operation import operation_fn
 from lib.report_op import report_AutoEncoder
 import time
 
-def standard_autoencoder_proc(c_conf, _intro_msg=_description):
+def standard_autoencoder_proc(c_conf, _intro_msg=_description, **kwargs):
     # ----------------------------------------------------------------
     # 0. Network Setting
     #----------------------------------------------------------------
@@ -63,7 +63,8 @@ def standard_autoencoder_proc(c_conf, _intro_msg=_description):
     # ----------------------------------------------------------------
     print(f"\nProcessing Time : {elapsed_time: .2f} sec")
     # ----------------------------------------------------------------
-    print(g_line + f"\n{__name__} : Please Check Window\n" + g_line)
+    _msg = f"\n{__name__} : Save graphics mode. Please wait\n" if c_conf.args.save_graphic else f"\n{__name__} : Please Check Window\n"
+    print(g_line + _msg + g_line)
     # ----------------------------------------------------------------
     c_repo(model=c_ae, test_loader=test_loader)
 

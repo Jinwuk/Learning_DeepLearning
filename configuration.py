@@ -18,22 +18,17 @@ g_line      = "----------------------------------------------------------------"
 # Following Libraries are a fundamental requirements
 # However, we employ only partial libraries within those
 # ----------------------------------------------------------------
-import numpy as np
+
 import torch
 from torch import nn
-from torch.nn import functional as F
-from torch.utils.data import DataLoader
-import torchvision
-import torchvision.transforms as Transforms
-from torchsummary import summary
-from matplotlib import pyplot as plt
-
-import os, sys
+from datetime import datetime
+import os, sys, textwrap
 import lib.interface_function as IF
 import lib.my_debug as DBG
 class configuration:
     def __init__(self, L_param, _intro_msg=_description, bUseParam=False):
-        self.args = IF.ArgumentParse(L_Param=L_param, _prog=__file__, _intro_msg=_intro_msg, bUseParam=bUseParam)
+        self.l_proc_msg = []
+        self.args       = IF.ArgumentParse(L_Param=L_param, _prog=__file__, _intro_msg=_intro_msg, bUseParam=bUseParam)
         # ----------------------------------------------------------------
         # Path and File
         #----------------------------------------------------------------
@@ -64,7 +59,7 @@ class configuration:
         self.SummaryWriterPATH  = self.fundamental_config['EXPERIMENT_PARAM']['SummaryWriterPATH']
         self.test_samples       = self.fundamental_config['EXPERIMENT_PARAM']['TEST_SAMPLES']
         self.model_file         = self.fundamental_config['EXPERIMENT_PARAM']['MODEL_FILE']
-
+        self.summary_text       = self.fundamental_config['EXPERIMENT_PARAM']['SUMMARYTXT']
         # ----------------------------------------------------------------
         # Optimizer Setting
         #----------------------------------------------------------------
@@ -75,15 +70,7 @@ class configuration:
         # ----------------------------------------------------------------
         # Operation Mode Setting
         #----------------------------------------------------------------
-        try:
-            self.loaded_model   = torch.load(self.model_file)
-            self.loaded_cf_model= torch.load(self.model_file_classfier)
-            _op_msg = "Inference mode" if self.args.inference_mode else "Normal Learning mode"
-        except Exception as e:
-            _op_msg = "Operation of inference mode is impossible. \nThere are not saved model files"
-            _op_msg+= f"\n Error : {e}"
-            self.args.inference_mode = False
-        print(_op_msg + "\n" + g_line)
+        self.model_setting()
         # ----------------------------------------------------------------
         # Miscellaneous Setting
         #----------------------------------------------------------------
@@ -93,6 +80,13 @@ class configuration:
         self.num_workers        = self.args.number_of_workers
         self.quite_mode         = self.args.quite_mode
         self.save_graphic       = self.args.save_graphic
+
+        self.pprint("----------------------------------------------------------------")
+        current_time = datetime.now()
+        self.pprint(f" Test start time : {current_time}")
+
+        self.pprint("----------------------------------------------------------------")
+
     def __call__(self, model, **kwargs):
         # ----------------------------------------------------------------
         # Configure __call__ 함수는 Loss function과 Optimizer Setting에 사용
@@ -122,6 +116,13 @@ class configuration:
 
         return cf_loss_fn, cf_optimizer
 
+    def __del__(self):
+        DBG.dbg("Debug Begin")
+        IF.put_result(_outfile=self.summary_text, _contents=self.l_proc_msg)
+        self.l_proc_msg.clear()
+    #----------------------------------------------------------------
+    # Internal Service
+    #----------------------------------------------------------------
     def model_setting(self):
         if self.args.processing_mode == 1:
             try:
@@ -160,9 +161,16 @@ class configuration:
                 _op_msg += f"\n Error : {e}"
                 self.args.inference_mode = False
             print(_op_msg + "\n" + g_line)
-
-
-
+    #----------------------------------------------------------------
+    # Outer Service
+    #----------------------------------------------------------------
+    def pprint(self, *msg, _active=True):
+        if _active:
+            _msg = textwrap.dedent(*msg)
+            self.l_proc_msg.append(*msg)
+            print(_msg)
+        else:
+            pass
 
 # =================================================================
 # Test Routine

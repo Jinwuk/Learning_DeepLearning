@@ -20,6 +20,7 @@ EXPERIMENT_PARAM:
   SummaryWriterPATH: .\runs\experiment_1
   TEST_SAMPLES: 5000
   MODEL_FILE: autoencoder_model.pth
+  SUMMARYTXT: summary_text.txt
 CLASSIFIER:
   HIDDEN: 64
   MODEL_FILE: classifier_model.pth
