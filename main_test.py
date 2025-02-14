@@ -36,12 +36,14 @@ import time
 # =================================================================
 if __name__ == "__main__":
     L_param=[]
-    #proc.standard_autoencoder_proc(L_param=L_param, _intro_msg=_description)
-
+    c_conf = configuration(L_param=L_param, _intro_msg=_description)
+    if c_conf.args.processing_mode == 1:
+        proc.standard_autoencoder_proc(c_conf=c_conf, _intro_msg=_description)
+        sys.exit()
+    else: pass
     # ----------------------------------------------------------------
     # 0. Network Setting
     #----------------------------------------------------------------
-    c_conf = configuration(L_param=L_param, _intro_msg=_description)
     c_data = Fashion_MNIST(conf_data=c_conf)
     c_oper = operation_fn(conf_data=c_conf)
     _c_ae_repo = report_AutoEncoder(conf_data=c_conf, c_op=c_oper, figsize=(8, 8), alpha=0.8, s=3)
@@ -90,6 +92,9 @@ if __name__ == "__main__":
     # 4. Report Result
     # ----------------------------------------------------------------
     print(f"\nProcessing Time : {elapsed_time: .2f} sec")
+    # ----------------------------------------------------------------
+    print(g_line + f"\n{__name__} : Please Check Window\n" + g_line)
+    # ----------------------------------------------------------------
     c_repo(l_model=lc_model, test_loader=test_loader, c_result=c_oper.sample_classinfo)
 
 

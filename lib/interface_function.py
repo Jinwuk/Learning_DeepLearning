@@ -21,22 +21,42 @@ def ArgumentParse(L_Param, _prog, _intro_msg=_description, bUseParam=False):
         prog=_prog,
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(_intro_msg))
-
-    parser.add_argument('-fc', '--fundamental_configure_file', help="fundamental_configure_file",
+    #----------------------------------------------------------------
+    # Help format
+    #"Save graphics Not use plt.show (Default : False)"
+    #
+    # ----------------------------------------------------------------
+    parser.add_argument('-fc', '--fundamental_configure_file',
+                        help="fundamental_configure_file     (Default : fundamental_configure.yaml",
                         type=str, default='fundamental_configure.yaml')
-    parser.add_argument('-lf', '--label_file', help="Label File for Data (Default : data_label.yaml)",
+    parser.add_argument('-dg', '--debug_mode', action='store_true',
+                        help="Debug mode activation          (Default : False)",
+                        default=False)
+    parser.add_argument('-pm', '--processing_mode',
+                        help='''\
+                        Processing Mode [0] Developing [1] AutoEncoder [2] AutoEncoder+Classifier \n
+                        [3] VAE [4] VAE+Classifier (Default : 0)"
+                        ''', type=int, default=2)
+    parser.add_argument('-lf', '--label_file',
+                        help="Label File for Data            (Default : data_label.yaml)",
                         type=str, default='data_label.yaml')
-    parser.add_argument('-dp', '--data_padding_size', help="data padding size (Default:2)",
+    parser.add_argument('-dp', '--data_padding_size',
+                        help="Data padding size              (Default : 2)",
                         type=int, default=2)
-    parser.add_argument('-nw', '--number_of_workers', help="number_of_workers (Default:4)",
+    parser.add_argument('-nw', '--number_of_workers',
+                        help="Number_of_workers              (Default : 4)",
                         type=int, default=4)
-    parser.add_argument('-qm', '--quite_mode', action='store_true', help="Quite mode (Default : False)",
+    parser.add_argument('-qm', '--quite_mode', action='store_true',
+                        help="Quite mode                     (Default : False)",
                         default=False)
-    parser.add_argument('-im', '--inference_mode', action='store_true', help="Inference mode (Default : False)",
+    parser.add_argument('-im', '--inference_mode', action='store_true',
+                        help="Inference mode                 (Default : False)",
                         default=False)
-    parser.add_argument('-ot', '--optimizer_spec', help="Optimizer Specification (Default : optimizer.yaml)",
+    parser.add_argument('-ot', '--optimizer_spec',
+                        help="Optimizer Specification        (Default : optimizer.yaml)",
                         type=str, default='optimizer.yaml')
-    parser.add_argument('-sg', '--save_graphic', action='store_true', help="Save graphics Not use plt.show (Default : False)",
+    parser.add_argument('-sg', '--save_graphic', action='store_true',
+                        help="Save graphics Not use plt.show (Default : False)",
                         default=False)
 
     args = parser.parse_args(L_Param) if bUseParam else parser.parse_args()

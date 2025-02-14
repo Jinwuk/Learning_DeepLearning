@@ -17,6 +17,7 @@ g_line      = "----------------------------------------------------------------"
 import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
+import my_debug as DBG
 
 class operation_fn:
     def __init__(self,conf_data):
@@ -184,7 +185,7 @@ class operation_fn:
         with torch.no_grad():
             output_imgs = model.generate(samples_torch).detach().cpu().numpy()
         output_imgs = output_imgs.transpose((0, 2, 3, 1))
-        print(np.shape(output_imgs))
+        DBG.dbg(np.shape(output_imgs), _active=c_config.args.debug_mode)
 
         return samples, output_imgs
     #----------------------------------------------------

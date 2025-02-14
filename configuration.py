@@ -78,9 +78,9 @@ class configuration:
         try:
             self.loaded_model   = torch.load(self.model_file)
             self.loaded_cf_model= torch.load(self.model_file_classfier)
-            _op_msg = "Inference mode"
+            _op_msg = "Inference mode" if self.args.inference_mode else "Normal Learning mode"
         except Exception as e:
-            _op_msg = "Operation of inference mode is impossible. \nThere is not any saved model file"
+            _op_msg = "Operation of inference mode is impossible. \nThere are not saved model files"
             _op_msg+= f"\n Error : {e}"
             self.args.inference_mode = False
         print(_op_msg + "\n" + g_line)
@@ -121,6 +121,48 @@ class configuration:
             print(g_line)
 
         return cf_loss_fn, cf_optimizer
+
+    def model_setting(self):
+        if self.args.processing_mode == 1:
+            try:
+                self.loaded_model   = torch.load(self.model_file)
+                _op_msg = "Inference mode" if self.args.inference_mode else "Normal Learning mode"
+            except Exception as e:
+                _op_msg = "Operation of inference mode is impossible. \nThere are not saved model files"
+                _op_msg += f"\n Error : {e}"
+                self.args.inference_mode = False
+            print(_op_msg + "\n" + g_line)
+        elif self.args.processing_mode == 2:
+            try:
+                self.loaded_model   = torch.load(self.model_file)
+            except Exception as e:
+                _op_msg = "Operation of inference mode is impossible. \nThere are not saved AutoEncoder model files\n"
+                _op_msg+= "You should run Autoencoder processing and generate the AutoEncoder model file\n"
+                _op_msg+= f"\n Error : {e}"
+                print(_op_msg + "\n" + g_line)
+                exit(0)
+
+            try:
+                self.loaded_cf_model= torch.load(self.model_file_classfier)
+                _op_msg = "Inference mode" if self.args.inference_mode else "Normal Learning mode"
+            except Exception as e:
+                _op_msg = "Operation of inference mode is impossible. \nThere are not saved model files"
+                _op_msg += f"\n Error : {e}"
+                print(_op_msg + "\n" + g_line)
+                self.args.inference_mode = False
+        else: # You should modify the below codes appropriately.
+            try:
+                self.loaded_model = torch.load(self.model_file)
+                self.loaded_cf_model = torch.load(self.model_file_classfier)
+                _op_msg = "Inference mode" if self.args.inference_mode else "Normal Learning mode"
+            except Exception as e:
+                _op_msg = "Operation of inference mode is impossible. \nThere are not saved model files"
+                _op_msg += f"\n Error : {e}"
+                self.args.inference_mode = False
+            print(_op_msg + "\n" + g_line)
+
+
+
 
 # =================================================================
 # Test Routine

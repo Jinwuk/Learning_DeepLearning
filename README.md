@@ -58,6 +58,110 @@ python main_test.py
 python main_test.py -sg -im
 ~~~
 
+## Pytorch의 함수와 Loss function 문제 (Softmax vs Loss-functions)
+- pytorch loss function의 입력은 어떻게 되는가? softmax와 같은 nn.function의 출력을 입력으로 받아들이지 못하는가?
+### Answer
+PyTorch의 손실 함수는 일반적으로 모델의 출력과 대상(타깃) 값을 입력으로 받습니다. softmax와 같은 torch.nn.functional 함수의 출력을 직접 손실 함수의 입력으로 사용할 수 있습니다.
+예를 들어, 분류 문제에서 CrossEntropyLoss를 사용할 때, 모델의 출력을 softmax를 거치지 않고 바로 사용해도 됩니다. CrossEntropyLoss는 내부적으로 softmax와 log를 적용하기 때문입니다. 다음은 그 예제입니다:
+
+- 예제 코드
+~~~python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# 예제 텐서 생성
+predictions = torch.randn(3, 5)  # (배치 크기, 클래스 수)
+targets = torch.tensor([1, 0, 4])  # 대상 (타깃) 값
+
+# 손실 함수 정의
+loss_fn = nn.CrossEntropyLoss()
+
+# 손실 계산
+loss = loss_fn(predictions, targets)
+print(f"손실: {loss.item()}")
+~~~
+이 코드는 모델의 출력 predictions와 타깃 targets를 사용하여 손실 값을 계산합니다. CrossEntropyLoss는 모델의 출력에 softmax를 내부적으로 적용하므로, 추가로 softmax를 적용할 필요가 없습니다.
+하지만 MSELoss(Mean Squared Error Loss)와 같은 다른 손실 함수에서는 모델의 출력에 softmax를 명시적으로 적용해야 할 수도 있습니다. 이 경우 다음과 같이 작성할 수 있습니다:
+
+~~~python
+# softmax 적용
+softmax_output = F.softmax(predictions, dim=1)
+
+# MSELoss 사용
+mse_loss_fn = nn.MSELoss()
+targets_one_hot = F.one_hot(targets, num_classes=5).float()  # 타깃을 원-핫 인코딩
+
+# 손실 계산
+mse_loss = mse_loss_fn(softmax_output, targets_one_hot)
+print(f"MSE 손실: {mse_loss.item()}")
+~~~
+이 예제에서는 softmax를 적용한 후 MSELoss를 계산합니다. 따라서 손실 함수의 입력으로 softmax 출력을 사용할 수 있습니다.
+
+
+## Saved Model
+.\data\saved_model 에 다음 model 파일을 저장하였다.
+이 파일의 Dimension은 다음과 같다.
+~~~bash
+autoencoder_model.pth
+classifier_model.pth
+~~~
+- AutoEncoder
+~~~bash
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv2d-1           [-1, 32, 16, 16]             320
+              ReLU-2           [-1, 32, 16, 16]               0
+            Conv2d-3             [-1, 64, 8, 8]          18,496
+              ReLU-4             [-1, 64, 8, 8]               0
+            Conv2d-5            [-1, 128, 4, 4]          73,856
+              ReLU-6            [-1, 128, 4, 4]               0
+           Flatten-7                 [-1, 2048]               0
+            Linear-8                    [-1, 2]           4,098
+           Encoder-9                    [-1, 2]               0
+           Linear-10                 [-1, 2048]           6,144
+  ConvTranspose2d-11            [-1, 128, 8, 8]         147,584
+             ReLU-12            [-1, 128, 8, 8]               0
+  ConvTranspose2d-13           [-1, 64, 16, 16]          73,792
+             ReLU-14           [-1, 64, 16, 16]               0
+  ConvTranspose2d-15           [-1, 32, 32, 32]          18,464
+             ReLU-16           [-1, 32, 32, 32]               0
+           Conv2d-17            [-1, 1, 32, 32]             289
+          Decoder-18            [-1, 1, 32, 32]               0
+================================================================
+Total params: 343,043
+Trainable params: 343,043
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.00
+Forward/backward pass size (MB): 1.14
+Params size (MB): 1.31
+Estimated Total Size (MB): 2.45
+----------------------------------------------------------------
+~~~
+- classifier
+~~~bash
+----------------------------------------------------------------
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Linear-1                [-1, 1, 64]             192
+              ReLU-2                [-1, 1, 64]               0
+            Linear-3                [-1, 1, 64]           4,160
+              ReLU-4                [-1, 1, 64]               0
+            Linear-5                [-1, 1, 10]             650
+================================================================
+Total params: 5,002
+Trainable params: 5,002
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.00
+Forward/backward pass size (MB): 0.00
+Params size (MB): 0.02
+Estimated Total Size (MB): 0.02
+----------------------------------------------------------------
+~~~
 
 
 ## Developing Memo

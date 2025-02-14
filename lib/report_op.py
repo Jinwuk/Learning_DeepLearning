@@ -44,6 +44,7 @@ class report_AutoEncoder:
         # 2. Generate Embedding Points and Labels
         output_embs, output_labels  = self.c_op.generate_embeds_and_labels(model=model, test_loader=test_loader)
         samples, output_imgs        = self.c_op.generate_samples(c_config=self.c_conf, model=model, output_embs=output_embs)
+        # 3. Plotting the results
         if _mode == 0:
             self.plot_embeds_and_labels(output_embs=output_embs, output_labels=output_labels)
         elif _mode == 1:
@@ -96,7 +97,7 @@ class report_AutoEncoder:
 
         # processing for kwargs
         if _exist_kwargs:
-            print(f" index   test           prediction")
+            print(f" index        test  prediction")
         else: pass
         # Generate new images from sampled embeddings
         fig, axes = plt.subplots(nrows=3, ncols=6, figsize=(10, 6))
@@ -112,7 +113,7 @@ class report_AutoEncoder:
             if _exist_kwargs:
                 _test_idx, _pred_idx = int(test_y[i]), int(pred_y[i])
                 _msg_str  = f"{i:2d} ({samples[i][0]:5.1f}, {samples[i][1]:5.1f}) {test_y[i]:2d}  {pred_y[i]:2d}"
-                _msg_str += f"| {self.data_label[_test_idx]:11s}  {self.data_label[_pred_idx]:11s}"
+                _msg_str += f" | {self.data_label[_test_idx]:11s}  {self.data_label[_pred_idx]:11s}"
                 print(_msg_str)
             else: pass
         self.plt_show_method()
