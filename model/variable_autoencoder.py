@@ -143,9 +143,9 @@ class VAE(nn.Module):
 
     def forward(self, x):
         mean, logvar = self.encoder(x)
-        z = self.reparameterize(mean, logvar)
+        z       = self.reparameterize(mean, logvar)
         recon_x = self.decoder(z)
-        return recon_x, mean, logvar
+        return recon_x, mean, logvar, z
 
     def generate(self, z):
         return F.sigmoid(self.decoder(z))

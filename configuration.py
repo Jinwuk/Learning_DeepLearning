@@ -46,6 +46,7 @@ class configuration:
         self.epoch              = self.fundamental_config['OP_SPEC']['EPOCHS']
         self.buffer_size        = self.fundamental_config['OP_SPEC']['BUFFER_SIZE']
         self.validation_split   = self.fundamental_config['OP_SPEC']['VALIDATION_SPLIT']
+        self.kl_divergence_weight=self.fundamental_config['OP_SPEC']['KLDIVWEIGHT']
         self.image_size         = self.fundamental_config['DATASPEC']['IMAGE_SIZE']
         self.channels           = self.fundamental_config['DATASPEC']['CHANNELS']
         self.batch_size         = self.fundamental_config['DATASPEC']['BATCH_SIZE']
@@ -100,6 +101,11 @@ class configuration:
             elif _model_name == 'Classifier_for_autoencoder':
                 cf_loss_fn    = nn.CrossEntropyLoss()
                 cf_optimizer  = self.c_optimizer(model.parameters(), lr=self.learning_rate)
+            elif _model_name == 'VAE':
+                cf_loss_fn    = []
+                cf_loss_fn.append(nn.BCEWithLogitsLoss(reduction=self.loss_fn_param))
+                cf_loss_fn.append(self.kl_divergence)
+                cf_optimizer = self.c_optimizer(model.parameters(), lr=self.learning_rate)
             else:
                 DBG.dbg("Model has not been specified. It is error")
                 exit(0)
@@ -110,7 +116,14 @@ class configuration:
             self.pprint(f"Model Name    : %s" %_model_name)
             self.pprint(f"Optimizer     : %s.%s" %(self.c_optimizer.__module__, self.c_optimizer.__ne__))
             self.pprint(f" learning_rate: %f" %self.learning_rate)
-            self.pprint(f"Loss Function : %s.%s" %(cf_loss_fn.__module__, cf_loss_fn.__ne__))
+            if isinstance(cf_loss_fn, list):
+                for _k, _fn in enumerate(cf_loss_fn):
+                    try:
+                        self.pprint(f"Loss Function%d: %s.%s" %(_k, _fn.__name__, _fn.__ne__))
+                    except:
+                        self.pprint(f"Loss Function%d: %s.%s" % (_k, _fn.__module__, _fn.__ne__))
+            else:
+                self.pprint(f"Loss Function : %s.%s" %(cf_loss_fn.__module__, cf_loss_fn.__ne__))
             self.pprint(f"    parameter : %s" %self.loss_fn_param)
             self.pprint(f"Device for OP : %s" %self.device)
             self.pprint(g_line)
@@ -120,6 +133,10 @@ class configuration:
     #----------------------------------------------------------------
     # Internal Service
     #----------------------------------------------------------------
+    def kl_divergence(self, mean, logvar):
+        loss = -0.5 * (1 + logvar - torch.square(mean) - torch.exp(logvar)).sum(axis=1)
+        return loss.mean()
+
     def model_setting(self):
         if self.args.processing_mode == 1:
             try:
