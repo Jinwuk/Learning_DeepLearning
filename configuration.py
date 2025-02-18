@@ -46,7 +46,7 @@ class configuration:
         self.epoch              = self.fundamental_config['OP_SPEC']['EPOCHS']
         self.buffer_size        = self.fundamental_config['OP_SPEC']['BUFFER_SIZE']
         self.validation_split   = self.fundamental_config['OP_SPEC']['VALIDATION_SPLIT']
-        self.kl_divergence_weight=self.fundamental_config['OP_SPEC']['KLDIVWEIGHT']
+        self.kl_divergence_weight=float(self.fundamental_config['OP_SPEC']['KLDIVWEIGHT'])
         self.image_size         = self.fundamental_config['DATASPEC']['IMAGE_SIZE']
         self.channels           = self.fundamental_config['DATASPEC']['CHANNELS']
         self.batch_size         = self.fundamental_config['DATASPEC']['BATCH_SIZE']
@@ -77,7 +77,8 @@ class configuration:
         # Miscellaneous Setting
         #----------------------------------------------------------------
         self.label_path         = os.path.join(self.root_path, self.args.label_file)
-        self.data_label         = IF.read_yaml(self.label_path)
+        #self.data_label         = IF.read_yaml(self.label_path)
+        self.data_label         = []
         self.data_padding_size  = self.args.data_padding_size
         self.num_workers        = self.args.number_of_workers
         self.quite_mode         = self.args.quite_mode
@@ -178,6 +179,8 @@ class configuration:
     #----------------------------------------------------------------
     # Outer Service
     #----------------------------------------------------------------
+    def set_data_label(self, l_label):
+        self.data_label = l_label
     def pprint(self, *msg, _active=True):
         if _active:
             _msg = textwrap.dedent(*msg)

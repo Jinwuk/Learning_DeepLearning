@@ -48,8 +48,7 @@ if __name__ == "__main__":
     #----------------------------------------------------------------
     c_data      = Fashion_MNIST(conf_data=c_conf)
     c_oper      = operation_fn(conf_data=c_conf)
-    _c_ae_repo  = report_AutoEncoder(conf_data=c_conf, c_op=c_oper, figsize=(8, 8), alpha=0.8, s=3)
-    c_repo      = report_Classfier_for_AutoEncoder(conf_data=c_conf, c_op=c_oper, ae_repo=_c_ae_repo)
+    c_repo      = report_AutoEncoder(conf_data=c_conf, c_op=c_oper, figsize=(8, 8), alpha=0.8, s=3)
     # ----------------------------------------------------------------
     # 1. Network Setting
     # ----------------------------------------------------------------
@@ -91,7 +90,7 @@ if __name__ == "__main__":
     _msg  = f"\n{__name__} : Save graphics mode. Please wait\n" if c_conf.args.save_graphic else f"\n{__name__} : Please Check Window\n"
     print(g_line + _msg + g_line)
     # ----------------------------------------------------------------
-    c_repo(l_model=lc_model, test_loader=test_loader, c_result=c_oper.sample_classinfo)
+    c_repo(model=c_vae, test_loader=test_loader)
     c_conf.write_txt_result()
 
     print("===================================================")

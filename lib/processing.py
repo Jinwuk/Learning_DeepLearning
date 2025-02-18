@@ -117,8 +117,9 @@ def autoencoder_classfication(c_conf, _intro_msg=_description, **kwargs):
     else:
         # 1. Normal AutoLearning processing
         for i in range(c_conf.epoch):
-            train_bce_loss, train_kl_loss = c_oper.train_vae(l_model=lc_model, dataloader=train_loader, optimizer=cf_optimizer, l_loss_fn=cf_loss_fn)
-            test_bce_loss, test_kl_loss   = c_oper.validate_vae(l_model=lc_model, dataloader=test_loader, l_loss_fn=cf_loss_fn)
+            train_loss          = c_oper.train_classifier(l_model=lc_model, dataloader=train_loader,
+                                                  optimizer=cf_optimizer, loss_fn=cf_loss_fn)
+            test_loss, _correct = c_oper.validate_classifier(l_model=lc_model, dataloader=test_loader, loss_fn=cf_loss_fn)
             c_oper.record_result(_epoch=i, train_loss=train_loss, test_loss=test_loss, correct=_correct)
 
     elapsed_time = time.time() - start_time

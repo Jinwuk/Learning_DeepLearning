@@ -29,7 +29,7 @@ class Fashion_MNIST:
         self.batch_size     = conf_data.batch_size
         self.data_padding_size = conf_data.data_padding_size
         self.data_shape     = None
-
+        self.c_conf         = conf_data
     # first define a transform function, to turn images into tersors
     def set_data_transform(self):
         _transform = Transforms.Compose([
@@ -52,6 +52,8 @@ class Fashion_MNIST:
             exit(0)
         # Check Data Shape
         self.data_shape = next(iter(train_loader))[0].shape
+        # Set data classes
+        self.c_conf.set_data_label(l_label=train_ds.classes)
 
         return train_loader, test_loader
 

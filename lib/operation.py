@@ -153,18 +153,18 @@ class operation_fn:
         # Train Setting
         # ----------------------------------------------------
         DEVICE = self.c_config.device
-        ae_model = l_model[0]
+        vae_model = l_model[0]
         bce_loss_fn, kl_loss_fn = l_loss_fn[0], l_loss_fn[1]
         # ----------------------------------------------------
         # Main routine
         # ----------------------------------------------------
-        ae_model.train()
+        vae_model.train()
         running_bce_loss, running_kl_loss = 0, 0
 
         for i, (train_x, train_y) in enumerate(dataloader):
             optimizer.zero_grad()
             train_x = train_x.to(DEVICE)
-            recon_x, mean, logvar, _ = ae_model(train_x)
+            recon_x, mean, logvar, _ = vae_model(train_x)
 
             bce_loss    = bce_loss_fn(recon_x, train_x)
             kl_loss     = kl_loss_fn(mean, logvar)
@@ -183,18 +183,18 @@ class operation_fn:
         # Validate Setting
         # ----------------------------------------------------
         DEVICE = self.c_config.device
-        ae_model = l_model[0]
+        vae_model = l_model[0]
         bce_loss_fn, kl_loss_fn = l_loss_fn[0], l_loss_fn[1]
         # ----------------------------------------------------
         # Main routine
         # ----------------------------------------------------
-        ae_model.eval()
+        vae_model.eval()
         running_bce_loss, running_kl_loss = 0, 0
 
         for i, (test_x, test_y) in enumerate(dataloader):
             test_x = test_x.to(DEVICE)
             with torch.no_grad():
-                recon_x, mean, logvar = ae_model(test_x)
+                recon_x, mean, logvar, _ = vae_model(test_x)
                 bce_loss    = bce_loss_fn(recon_x, test_x)
                 kl_loss     = kl_loss_fn(mean, logvar)
 
@@ -206,10 +206,19 @@ class operation_fn:
     # Generate Images
     #----------------------------------------------------
     def generate_embeds_and_labels(self, model, test_loader):
+        _model_name = model.__module__
         for i, (test_x, test_y) in enumerate(test_loader):
             test_x = test_x.to(self.device)
             with torch.no_grad():
-                embeddings = model.encoder(test_x)
+                if _model_name == "model.auto_encoder":
+                    embeddings = model.encoder(test_x)
+                elif _model_name == "model.variable_autoencoder":
+                    _mean, _logvar  = model.encoder(test_x)
+                    embeddings      = model.reparameterize(mean=_mean, logvar=_logvar)
+                else:
+                    DBG.dbg("No module name specified. it is error")
+                    exit(0)
+
             if i == 0:
                 self.output_embs = embeddings
                 self.output_labels = test_y
@@ -261,7 +270,6 @@ class operation_fn:
         # ----------------------------------------------------
         # Setting parameters with **kwargs
         # ----------------------------------------------------
-        _epoch          = kwargs['_epoch']
         train_loss_bce  = kwargs['train_loss_bce']
         train_loss_kl   = kwargs['train_loss_kl']
         test_loss_bce   = kwargs['test_loss_bce']
@@ -274,8 +282,7 @@ class operation_fn:
         #----------------------------------------------------
         # **kwargs correct = _correct
         # ----------------------------------------------------
-        self.c_config.pprint(f"Epoch {_epoch + 1: 3d}  Train/loss (BCE)  {train_loss_bce:.4f}  Test/loss (BCE)  {test_loss_bce:.4f}\
-                             Train/loss (KL)  {train_loss_kl:.4f}  Test/loss (KL)  {test_loss_kl:.4f}")
+        self.c_config.pprint(f"Epoch {_epoch + 1: 3d}  Train/loss (BCE)  {train_loss_bce:.4f}  Test/loss (BCE)  {test_loss_bce:.4f}  Train/loss (KL)  {train_loss_kl:.4f}  Test/loss (KL)  {test_loss_kl:.4f}")
     def save_model_parameter(self, model, _file_name):
         torch.save(model.state.dict(), _file_name)
         print("Save the learned model to %s")
