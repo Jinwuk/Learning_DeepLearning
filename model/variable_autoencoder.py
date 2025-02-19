@@ -93,6 +93,7 @@ class Decoder(nn.Module):
         #----------------------------------------------------------------
         # Fundamental Spec
         #----------------------------------------------------------------
+        self.conf    = c_config
         _data_ch     = c_config.fundamental_config['DATASPEC']['CHANNELS']
         _kernel_size = c_config.fundamental_config['NETWORK_PARAMS']['KERNEL']
         _stride      = c_config.fundamental_config['NETWORK_PARAMS']['STRIDE']
@@ -156,8 +157,8 @@ class VAE(nn.Module):
         return mean + std * eps
 
     # Service function
-    def print_summary(self, _shape, _quite=True):
+    def print_summary(self, model, _shape, _quite=True):
         if _quite == False:
-            summary(self, _shape)
+            summary(self, _shape, device=self.conf.device)
         else:
             pass
