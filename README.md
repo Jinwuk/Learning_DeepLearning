@@ -1,7 +1,6 @@
 # Learning_DeepLearning
+
 [toc]
-
-
 
 "만들면서 배우는 생성 AI"를 실습하면서 여러가지 테스트 코드를 만든다. 몇 가지 테스트 코드는 실제 사용 및 실습을 염두에 두고 만든다.
 환경은 py3.11.4를 중심으로 생성된다. 
@@ -33,6 +32,7 @@ tensorboard --logdir=runs
 ~~~bash
 pkill -f tensorboard
 ~~~
+
 ### 원격으로  Tensorboard 접속하는 법
 예를 들어 Windows PC에서 Linux PC에서 수행한 결과를 Windows Web Browser에서 보고 싶다고 가정하자.
 ssh로 접근한 다음 다음과 같이 Tensorboard를 수행한다.

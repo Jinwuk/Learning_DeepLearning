@@ -157,8 +157,8 @@ class VAE(nn.Module):
         return mean + std * eps
 
     # Service function
-    def print_summary(self, model, _shape, _quite=True):
+    def print_summary(self, _shape, _quite=True):
         if _quite == False:
-            summary(self, _shape, device=self.conf.device)
+            summary(self, _shape)
         else:
             pass
