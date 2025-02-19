@@ -51,8 +51,7 @@ class configuration:
         self.channels           = self.fundamental_config['DATASPEC']['CHANNELS']
         self.batch_size         = self.fundamental_config['DATASPEC']['BATCH_SIZE']
         # For CUDA setting
-        _cuda_info              = 'cuda:' + str(self.args.gpu_id)
-        self.fundamental_config['DEVICE'] = _cuda_info if torch.cuda.is_available() else 'cpu'
+        self.fundamental_config['DEVICE'] = 'cuda:0' if torch.cuda.is_available() else 'cpu'
         self.device             = self.fundamental_config['DEVICE']
         # Additional Model
         self.hidden_lyr         = self.fundamental_config['CLASSIFIER']['HIDDEN']
@@ -117,7 +116,7 @@ class configuration:
         finally:
             self.pprint(f"Model Name    : %s" %_model_name)
             self.pprint(f"Optimizer     : %s.%s" %(self.c_optimizer.__module__, self.c_optimizer.__ne__))
-            self.pprint(f" learning_rate: %f" %self.learning_rate)
+            self.pprint(f" learning_rate : %f" %self.learning_rate)
             if isinstance(cf_loss_fn, list):
                 for _k, _fn in enumerate(cf_loss_fn):
                     try:
@@ -126,8 +125,9 @@ class configuration:
                         self.pprint(f"Loss Function%d: %s.%s" % (_k, _fn.__module__, _fn.__ne__))
             else:
                 self.pprint(f"Loss Function : %s.%s" %(cf_loss_fn.__module__, cf_loss_fn.__ne__))
-            self.pprint(f"    parameter : %s" %self.loss_fn_param)
+            self.pprint(f"    parameter     : %s" %self.loss_fn_param)
             self.pprint(f"Device for OP : %s" %self.device)
+            self.pprint(f"Physical GPU  : {self.args.gpu_id}")
             self.pprint(g_line)
 
         return cf_loss_fn, cf_optimizer
