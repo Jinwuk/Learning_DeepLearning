@@ -52,7 +52,7 @@ class configuration:
         self.batch_size         = self.fundamental_config['DATASPEC']['BATCH_SIZE']
         # For CUDA setting
         torch.cuda.set_device(self.args.gpu_id)
-        self.fundamental_config['DEVICE'] = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+        self.fundamental_config['DEVICE'] = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.device             = self.fundamental_config['DEVICE']
         # Additional Model
         self.hidden_lyr         = self.fundamental_config['CLASSIFIER']['HIDDEN']
