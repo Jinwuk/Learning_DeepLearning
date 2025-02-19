@@ -18,7 +18,7 @@ LEARNING_PARAMS:
   LEARNING_RATE: 1e-3
   LOSS_PARAM: mean
 EXPERIMENT_PARAM:
-  SummaryWriterPATH: .\runs\experiment_1
+  SummaryWriterPATH: runs
   TEST_SAMPLES: 5000
   MODEL_FILE: autoencoder_model.pth
   SUMMARYTXT: summary_text.txt

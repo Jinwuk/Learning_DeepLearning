@@ -1,4 +1,8 @@
 # Learning_DeepLearning
+[toc]
+
+
+
 "만들면서 배우는 생성 AI"를 실습하면서 여러가지 테스트 코드를 만든다. 몇 가지 테스트 코드는 실제 사용 및 실습을 염두에 두고 만든다.
 환경은 py3.11.4를 중심으로 생성된다. 
 
@@ -23,6 +27,11 @@ from matplotlib import pyplot as plt
 - 가급적 별도의 command 혹은 conda 창을 띄워서 사용한다.
 ~~~bash
 tensorboard --logdir=runs
+~~~
+
+멈출때는 CTRL+C 혹은 다음과 같이 멈춘다.
+~~~bash
+pkill -f tensorboard
 ~~~
 
 ## 원격 SSH로 Windwos conda 환경 실행하기
@@ -163,6 +172,14 @@ Estimated Total Size (MB): 0.02
 ----------------------------------------------------------------
 ~~~
 
+## Comparison Performance 
+VAE를 Fashion MNIST에 대하여 학습하는 실험을 하였을 때 다음과 같은 결과가 나왔다
+
+|       GPU          | OP. time     |     OS    | EPOCH | 
+|--------------------|--------------|-----------|-------|
+| GeForce RTX 3050   |    112.96    | Windows 11|    10 |
+| GeForce GTX 1080 Ti|     46.98    | Ubuntu 24 |    10 |   
+
 
 ## Developing Memo
 ### sys.append(path)
@@ -171,3 +188,4 @@ Estimated Total Size (MB): 0.02
 ### summary와 forward
 summary 를 구하기 위해 한번 pytorch는 전체 구조를 forward 하여 Dimension을 구한다.
 따라서 model의 forward 함수가 호출된다.
+
