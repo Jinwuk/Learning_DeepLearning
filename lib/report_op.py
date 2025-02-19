@@ -17,9 +17,9 @@ Example :  There is no Operation instruction.
 '''
 g_line      = "----------------------------------------------------------------"
 
-import numpy as np
 import os
 from matplotlib import pyplot as plt
+
 class report_AutoEncoder:
     def __init__(self, conf_data, c_op, **kwargs):
         #----------------------------------------------------
@@ -144,3 +144,6 @@ class report_Classfier_for_AutoEncoder:
 
         self.ae_repo.plot_samples_and_recon_images(output_embs=output_embs, output_labels=output_labels,
                                                samples=samples, output_imgs=output_imgs, c_result=c_result)
+
+
+

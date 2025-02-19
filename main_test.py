@@ -28,6 +28,7 @@ from lib.operation import operation_fn
 from lib.report_op import report_AutoEncoder
 from lib.report_op import report_Classfier_for_AutoEncoder
 import lib.processing as proc
+import lib.report_op as c_rep
 import time
 
 # =================================================================

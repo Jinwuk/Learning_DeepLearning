@@ -207,3 +207,48 @@ VAE를 Fashion MNIST에 대하여 학습하는 실험을 하였을 때 다음과
 summary 를 구하기 위해 한번 pytorch는 전체 구조를 forward 하여 Dimension을 구한다.
 따라서 model의 forward 함수가 호출된다.
 
+### GPU가 여러장 꽂힌 컴퓨터에서 cuda:0을 하드웨어상의 n번 GPU에서 구동시키기 위한 방법은?
+GPU가 여러 장 꽂힌 컴퓨터에서 `cuda:0`을 하드웨어상의 특정 GPU(예: 2번 GPU)에서 구동시키려면 CUDA 장치 ID를 명시적으로 지정해야 합니다. 다음은 몇 가지 방법입니다.
+
+**1. CUDA_VISIBLE_DEVICES 환경 변수 사용:**
+
+가장 일반적이고 권장되는 방법입니다.  이 환경 변수를 설정하면 CUDA는 지정된 장치 ID만 인식하게 됩니다.
+
+* **Linux/macOS:**
+
+  ```bash
+  export CUDA_VISIBLE_DEVICES=2  # 2번 GPU만 보이게 설정
+  python your_script.py
+  ```
+
+* **Windows (명령 프롬프트):**
+
+  ```cmd
+  set CUDA_VISIBLE_DEVICES=2
+  python your_script.py
+  ```
+
+* **Windows (PowerShell):**
+
+  ```powershell
+  $env:CUDA_VISIBLE_DEVICES="2"
+  python your_script.py
+  ```
+
+이 방법을 사용하면 스크립트 내에서 `cuda:0`을 사용하더라도 CUDA는 `CUDA_VISIBLE_DEVICES`에 지정된 GPU, 즉 하드웨어상의 2번 GPU를 사용하게 됩니다.  다른 GPU는 CUDA에서 보이지 않게 되므로, 에러를 방지할 수 있습니다.
+
+**2. 코드 내에서 torch.cuda.set_device() 사용 (PyTorch):**
+
+PyTorch를 사용하는 경우 코드 내에서 특정 GPU를 설정할 수 있습니다.
+
+```python
+import torch
+
+torch.cuda.set_device(2)  # 2번 GPU 사용
+
+# 이제 cuda:0은 2번 GPU를 가리킵니다.
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+model = YourModel().to(device)
+```
+
+이 방법은 스크립트 내에서만 GPU를 설정하므로, 다른 스크립트에는 영향을 주지 않습니다.  `CUDA_VISIBLE_DEVICES` 환경 변수를 함께 사용하면 더욱 안전합니다.

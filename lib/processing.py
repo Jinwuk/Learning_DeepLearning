@@ -16,12 +16,12 @@ Example :  python main_test.py
 g_line      = "----------------------------------------------------------------"
 
 from configuration import configuration
-from lib.data_proc import Fashion_MNIST
+from data_proc import Fashion_MNIST
 from model.auto_encoder import AutoEncoder
-from lib.operation import operation_fn
-from lib.report_op import report_AutoEncoder
+from operation import operation_fn
+from report_op import report_AutoEncoder
 from model.auto_encoder import Classifier_for_autoencoder
-from lib.report_op import report_Classfier_for_AutoEncoder
+from report_op import report_Classfier_for_AutoEncoder
 
 import time
 
