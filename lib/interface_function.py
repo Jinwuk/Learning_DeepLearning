@@ -46,6 +46,9 @@ def ArgumentParse(L_Param, _prog, _intro_msg=_description, bUseParam=False):
     parser.add_argument('-nw', '--number_of_workers',
                         help="Number_of_workers              (Default : 4)",
                         type=int, default=4)
+    parser.add_argument('-gi', '--gpu_id',
+                        help="GPU ID                         (Default : 0)",
+                        type=int, default=0)
     parser.add_argument('-qm', '--quite_mode', action='store_true',
                         help="Quite mode                     (Default : False)",
                         default=False)

@@ -33,6 +33,24 @@ tensorboard --logdir=runs
 ~~~bash
 pkill -f tensorboard
 ~~~
+### 원격으로  Tensorboard 접속하는 법
+예를 들어 Windows PC에서 Linux PC에서 수행한 결과를 Windows Web Browser에서 보고 싶다고 가정하자.
+ssh로 접근한 다음 다음과 같이 Tensorboard를 수행한다.
+~~~bash 
+tensorboard --logdir=./runs --bind_all
+~~~
+그러면 다음과 같이 ssh에서 server(Linux PC) 에서의 응답이 나온다.
+~~~bash
+TensorFlow installation not found - running with reduced feature set.
+
+NOTE: Using experimental fast data loading logic. To disable, pass
+    "--load_fast=false" and report issues on GitHub. More details:
+    https://github.com/tensorflow/tensorboard/issues/4784
+
+TensorBoard 2.12.1 at http://sderoen-System-Product-Name:6006/ (Press CTRL+C to quit)
+~~~
+맨 하단의 주소 "http://sderoen-System-Product-Name:6006" 을 Windows PC의 Web Browser에서 입력하면 서버에서의 결과를 클라이언트에서 볼 수 있다.
+
 
 ## 원격 SSH로 Windwos conda 환경 실행하기
 간단하게 anaconda 혹은 miniconda의 activation.bat 가 실행되면 된다.
@@ -179,7 +197,7 @@ VAE를 Fashion MNIST에 대하여 학습하는 실험을 하였을 때 다음과
 |--------------------|--------------|-----------|-------|
 | GeForce RTX 3050   |    112.96    | Windows 11|    10 |
 | GeForce GTX 1080 Ti|     46.98    | Ubuntu 24 |    10 |   
-
+| A100-PCI           |     61.28    | Ubuntu 20.04 | 10 |     
 
 ## Developing Memo
 ### sys.append(path)
