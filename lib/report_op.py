@@ -20,6 +20,8 @@ g_line      = "----------------------------------------------------------------"
 import numpy as np
 import os
 from matplotlib import pyplot as plt
+from scipy.stats import norm
+
 class report_AutoEncoder:
     def __init__(self, conf_data, c_op, **kwargs):
         #----------------------------------------------------
@@ -52,6 +54,8 @@ class report_AutoEncoder:
                                                samples=samples, output_imgs=output_imgs)
         else:
             print("No operation for report")
+
+        return [output_embs, output_labels], [samples, output_imgs]
 
     def plt_show_method(self):
         if self.save_graphic:
@@ -144,3 +148,30 @@ class report_Classfier_for_AutoEncoder:
 
         self.ae_repo.plot_samples_and_recon_images(output_embs=output_embs, output_labels=output_labels,
                                                samples=samples, output_imgs=output_imgs, c_result=c_result)
+
+class report_VAE:
+    def __init__(self, conf_data, c_op, **kwargs):
+        #----------------------------------------------------
+        # Spec of kwargs
+        # ae_repo = AutoEncoder class
+        # ----------------------------------------------------
+        # kwargs
+        self.c_rep_ae   = kwargs['rep_ae']
+        # Data for plotting
+        self.c_op       = c_op
+        self.c_conf     = conf_data
+        self._count     = 0
+
+    def plot_embs_distribution(self, l_embs):
+        [output_embs, output_labels]    = l_embs
+
+        p = norm.cdf(output_embs)
+
+        plt.figure(figsize=(9, 8))
+        plt.scatter(p[:, 0],
+                    p[:, 1],
+                    c=output_labels,
+                    alpha=0.8,
+                    s=3)
+        plt.colorbar()
+        self.c_rep_ae.plt_show_method()

@@ -26,7 +26,7 @@ from lib.data_proc import Fashion_MNIST
 from model.variable_autoencoder import VAE
 from lib.operation import operation_fn
 from lib.report_op import report_AutoEncoder
-from lib.report_op import report_Classfier_for_AutoEncoder
+from lib.report_op import report_VAE
 import lib.processing as proc
 import time
 
@@ -40,6 +40,7 @@ if __name__ == "__main__":
         proc_function = []
         proc_function.append(proc.standard_autoencoder_proc)
         proc_function.append(proc.autoencoder_classfication)
+        proc_function.append(proc.vae_fashion_MNIST)
         proc_function[c_conf.args.processing_mode - 1](c_conf=c_conf, _intro_msg=_description)
         sys.exit()
     else: pass
@@ -90,7 +91,10 @@ if __name__ == "__main__":
     _msg  = f"\n{__name__} : Save graphics mode. Please wait\n" if c_conf.args.save_graphic else f"\n{__name__} : Please Check Window\n"
     print(g_line + _msg + g_line)
     # ----------------------------------------------------------------
-    c_repo(model=c_vae, test_loader=test_loader)
+    # Generate embs and samples
+    l_embs, l_samples = c_repo(model=c_vae, test_loader=test_loader)
+    c_repo_vae  = report_VAE(conf_data=c_conf, c_op=c_oper, rep_ae=c_repo)
+    c_repo_vae.plot_embs_distribution(l_embs = l_embs)
     c_conf.write_txt_result()
 
     print("===================================================")
