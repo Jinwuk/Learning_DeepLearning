@@ -1,23 +1,18 @@
 OP_SPEC:
-  EMBEDDING_DIM: 200     #Dimension of Latents Vector
-  EPOCHS: 15
+  EMBEDDING_DIM: 2
+  EPOCHS: 10
   BUFFER_SIZE: 1000
   VALIDATION_SPLIT: 0.2
-  KLDIVWEIGHT: 1.2
+  KLDIVWEIGHT: 3e-3
 DATASPEC:
-  DATA_DIR: 'CelebFaces/img_align_celeba/img_align_celeba/'
-  DATA_FOLDER: 'CelebFaces'
-  TRAINSET_RATIO: 0.8
-  IMAGE_SIZE: 64
-  CHANNELS: 3
+  IMAGE_SIZE: 32
+  CHANNELS: 1
   BATCH_SIZE: 128
 NETWORK_PARAMS:
-  FEATURES: 64
+  FEATURES: 2048
   KERNEL: 3
   LAYERS: 3
   STRIDE: 2
-  BLOCKS: 5
-  Z_DIMENSION: 256          # Number of Mean and Log_variance Dimension for Decoder
 LEARNING_PARAMS:
   OPTIMIZER: Adam
   LEARNING_RATE: 1e-3
@@ -25,7 +20,7 @@ LEARNING_PARAMS:
 EXPERIMENT_PARAM:
   SummaryWriterPATH: runs
   TEST_SAMPLES: 5000
-  MODEL_FILE: vae_celeb_model.pth
+  MODEL_FILE: autoencoder_model.pth
   SUMMARYTXT: summary_text.txt
   TEXTWRITEMODE: w
 CLASSIFIER:

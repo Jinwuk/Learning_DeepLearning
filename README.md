@@ -189,6 +189,21 @@ Estimated Total Size (MB): 0.02
 ----------------------------------------------------------------
 ~~~
 
+## Latent Vector Model 
+pytorch로 VAE의 Encoder part에서 Latent를 만들기 위해서는  mean과 variance vector를 구해야만 한다.
+이때, Fashion MNIST는 2-dimension 분포로 충분했었다. Latent가 어차피 2개 였으므로
+
+그런데 CelebA에서는 200 dimension이다. 이 부분을 살펴보면
+~~~python
+# Mapping features to mean and logvar
+# in dimension : 64ch x (2x2) = 256, out dimension = 200, latents ir embedding_dim
+self.mean   = nn.Linear(in_features=self.z_dimension, out_features=self.latents)
+self.logvar = nn.Linear(in_features=self.z_dimension, out_features=self.latents)
+~~~
+즉, 200 by 256 Linear가 필요하다.
+
+
+
 ## Comparison Performance 
 VAE를 Fashion MNIST에 대하여 학습하는 실험을 하였을 때 다음과 같은 결과가 나왔다
 

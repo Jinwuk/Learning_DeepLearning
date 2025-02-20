@@ -22,7 +22,8 @@ g_line      = "----------------------------------------------------------------"
 import torch
 from torch import nn
 from datetime import datetime
-import os, sys, textwrap
+from collections import defaultdict
+import os, sys, textwrap, copy
 import lib.interface_function as IF
 import lib.my_debug as DBG
 class configuration:
@@ -40,13 +41,21 @@ class configuration:
         # ----------------------------------------------------------------
         # Fundamental Configure
         #----------------------------------------------------------------
-        self.fundamental_config = IF.read_yaml(self.args.fundamental_configure_file)
+        self.fundamental_config = IF.read_yaml(self.args.fundamental_configure_file).copy()
 
         self.embedding_dim      = self.fundamental_config['OP_SPEC']['EMBEDDING_DIM']
         self.epoch              = self.fundamental_config['OP_SPEC']['EPOCHS']
         self.buffer_size        = self.fundamental_config['OP_SPEC']['BUFFER_SIZE']
         self.validation_split   = self.fundamental_config['OP_SPEC']['VALIDATION_SPLIT']
         self.kl_divergence_weight=float(self.fundamental_config['OP_SPEC']['KLDIVWEIGHT'])
+
+        try:
+            self.data_dir           = self.set_path_from_str(_path_str=self.fundamental_config['DATASPEC']['DATA_DIR'])
+            self.data_folder        = self.fundamental_config['DATASPEC']['DATA_FOLDER']
+            self.train_set_ratio    = self.fundamental_config['DATASPEC']['TRAINSET_RATIO']
+        except Exception as e:
+            pass
+
         self.image_size         = self.fundamental_config['DATASPEC']['IMAGE_SIZE']
         self.channels           = self.fundamental_config['DATASPEC']['CHANNELS']
         self.batch_size         = self.fundamental_config['DATASPEC']['BATCH_SIZE']
@@ -108,6 +117,12 @@ class configuration:
                 cf_loss_fn.append(nn.BCEWithLogitsLoss(reduction=self.loss_fn_param))
                 cf_loss_fn.append(self.kl_divergence)
                 cf_optimizer = self.c_optimizer(model.parameters(), lr=self.learning_rate)
+            elif _model_name == 'VAE_4_CELEBA':
+                cf_loss_fn = []
+                cf_loss_fn.append(self.mse_loss)
+                cf_loss_fn.append(self.kl_divergence)
+                cf_optimizer = self.c_optimizer(model.parameters(), lr=self.learning_rate)
+
             else:
                 DBG.dbg("Model has not been specified. It is error")
                 exit(0)
@@ -139,6 +154,19 @@ class configuration:
     def kl_divergence(self, mean, logvar):
         loss = -0.5 * (1 + logvar - torch.square(mean) - torch.exp(logvar)).sum(axis=1)
         return loss.mean()
+
+    def mse_loss(self, recons_x, x):
+        loss = ((recons_x - x) ** 2)
+        loss = loss.reshape(loss.shape[0], -1).sum(axis=1)
+        return loss.mean()
+
+    def set_path_from_str(self, _path_str):
+        s_data_dir              = _path_str
+        l_data_dir              = s_data_dir.split('/')
+        r_data_dir           = ''
+        for _data_dir in l_data_dir:
+            r_data_dir = os.path.join(r_data_dir, _data_dir)
+        return r_data_dir
 
     def model_setting(self):
         if self.args.processing_mode == 1:

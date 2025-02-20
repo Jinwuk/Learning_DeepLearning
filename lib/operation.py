@@ -202,6 +202,77 @@ class operation_fn:
             running_kl_loss += kl_loss.item()
 
         return running_bce_loss / len(dataloader), running_kl_loss / len(dataloader)
+    # ----------------------------------------------------
+    # Train/Validate VAE for CelebA : GPU Memory 절약 방법
+    # ----------------------------------------------------
+    # A single epoch train funcion
+    def train_vae_celeba(self, l_model, dataloader, optimizer, l_loss_fn):
+        # ----------------------------------------------------
+        # Train Setting
+        # ----------------------------------------------------
+        DEVICE  = self.c_config.device
+        BETA    = self.c_config.kl_divergence_weight
+        vae_model = l_model[0]
+        mse_loss_fn, kl_loss_fn = l_loss_fn[0], l_loss_fn[1]
+        # ----------------------------------------------------
+        # Main routine
+        # ----------------------------------------------------
+        vae_model.train()
+        running_mse_loss = 0
+        running_kl_loss = 0
+
+        for i, train_x in enumerate(dataloader):
+            optimizer.zero_grad()
+            train_x = train_x.to(DEVICE)
+            recon_x, mean, logvar = vae_model(train_x)
+            mse_loss= mse_loss_fn(recon_x, train_x)
+            kl_loss = kl_loss_fn(mean, logvar)
+
+            loss    = mse_loss + BETA * kl_loss
+
+            loss.backward()
+            optimizer.step()
+
+            running_mse_loss += mse_loss.item()     # item()은 Tensor를 Scalar로 변경
+            running_kl_loss  += kl_loss.item()      # mean()은 Tensor의 전체 평균
+
+            # GPU Memory 절약을 위함
+            del train_x, recon_x
+            torch.cuda.empty_cache()
+
+        return running_mse_loss / len(dataloader), running_kl_loss / len(dataloader)
+
+    # Validation function
+    def validate_vae_celeba(self, l_model, dataloader, l_loss_fn):
+        # ----------------------------------------------------
+        # Validate Setting
+        # ----------------------------------------------------
+        DEVICE = self.c_config.device
+        vae_model = l_model[0]
+        mse_loss_fn, kl_loss_fn = l_loss_fn[0], l_loss_fn[1]
+        # ----------------------------------------------------
+        # Main routine
+        # ----------------------------------------------------
+        vae_model.eval()
+        running_mse_loss = 0
+        running_kl_loss = 0
+
+        for i, test_x in enumerate(dataloader):
+            test_x = test_x.to(DEVICE)
+            with torch.no_grad():
+                recon_x, mean, logvar = vae_model(test_x)
+                mse_loss = mse_loss_fn(recon_x, test_x)
+                kl_loss = kl_loss_fn(mean, logvar)
+
+            running_mse_loss += mse_loss.item()
+            running_kl_loss  += kl_loss.item()
+
+            del test_x, recon_x
+            torch.cuda.empty_cache()
+
+        return running_mse_loss / len(dataloader), running_kl_loss / len(dataloader)
+
+
     #----------------------------------------------------
     # Generate Images
     #----------------------------------------------------
@@ -283,6 +354,29 @@ class operation_fn:
         # **kwargs correct = _correct
         # ----------------------------------------------------
         self.c_config.pprint(f"Epoch {_epoch + 1: 3d}  Train/loss (BCE)  {train_loss_bce:.4f}  Test/loss (BCE)  {test_loss_bce:.4f}  Train/loss (KL)  {train_loss_kl:.4f}  Test/loss (KL)  {test_loss_kl:.4f}")
+
+    def record_vae_celebA_result(self, _epoch, **kwargs):
+        # ----------------------------------------------------
+        # Setting parameters with **kwargs
+        # ----------------------------------------------------
+        train_loss_bce  = kwargs['train_loss_mse']
+        train_loss_kl   = kwargs['train_loss_kl']
+        test_loss_bce   = kwargs['test_loss_mse']
+        test_loss_kl    = kwargs['test_loss_kl']
+
+        self.writer.add_scalar("Train/loss (MSE)", train_loss_bce, _epoch)
+        self.writer.add_scalar("Train/loss (KL)",  train_loss_kl,  _epoch)
+        self.writer.add_scalar("Test/loss (MSE)",  test_loss_bce,  _epoch)
+        self.writer.add_scalar("Test/loss (KL)",   test_loss_kl,   _epoch)
+        #----------------------------------------------------
+        # **kwargs correct = _correct
+        # ----------------------------------------------------
+        self.c_config.pprint(f"Epoch {_epoch + 1: 3d}  Train/loss (MSE)  {train_loss_bce:.4f}  Test/loss (MSE)  {test_loss_bce:.4f}  Train/loss (KL)  {train_loss_kl:.4f}  Test/loss (KL)  {test_loss_kl:.4f}")
+
+
+
+
+
     def save_model_parameter(self, model, _file_name):
         torch.save(model.state.dict(), _file_name)
         print("Save the learned model to %s")
