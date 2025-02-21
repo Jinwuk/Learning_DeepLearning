@@ -1,5 +1,9 @@
 OP_SPEC:
+<<<<<<< HEAD
   EMBEDDING_DIM: 200
+=======
+  EMBEDDING_DIM: 200     #Dimension of Latents Vector
+>>>>>>> 94ebe2562ef2d641d4830c0ad3f9997e41f79b93
   EPOCHS: 15
   BUFFER_SIZE: 1000
   VALIDATION_SPLIT: 0.2
@@ -7,14 +11,25 @@ OP_SPEC:
 DATASPEC:
   DATA_DIR: 'CelebFaces/img_align_celeba/img_align_celeba/'
   DATA_FOLDER: 'CelebFaces'
+<<<<<<< HEAD
+=======
+  TRAINSET_RATIO: 0.8
+>>>>>>> 94ebe2562ef2d641d4830c0ad3f9997e41f79b93
   IMAGE_SIZE: 64
   CHANNELS: 3
   BATCH_SIZE: 128
+  TRAIN_RATIO: 0.8
 NETWORK_PARAMS:
   FEATURES: 64
+<<<<<<< HEAD
+  BLOCKS: 5
+=======
+>>>>>>> 94ebe2562ef2d641d4830c0ad3f9997e41f79b93
   KERNEL: 3
   LAYERS: 3
   STRIDE: 2
+  BLOCKS: 5
+  Z_DIMENSION: 256          # Number of Mean and Log_variance Dimension for Decoder
 LEARNING_PARAMS:
   OPTIMIZER: Adam
   LEARNING_RATE: 1e-3

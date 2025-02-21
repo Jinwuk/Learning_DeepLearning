@@ -175,3 +175,14 @@ class report_VAE:
                     s=3)
         plt.colorbar()
         self.c_rep_ae.plt_show_method()
+
+# ----------------------------------------------------------------
+# For the report of VAE_for_celeb_A
+# ----------------------------------------------------------------
+class report_VAE_celeb_a(report_AutoEncoder):
+    def __init__(self,conf_data, c_op, **kwargs):
+        super().__init__(conf_data=conf_data, c_op=c_op, kwargs=kwargs)
+
+    def __call__(self, model, test_loader, _mode=1):
+        # 1. Save Learned model
+        torch.save(model.state_dict(), self.c_conf.model_file)
