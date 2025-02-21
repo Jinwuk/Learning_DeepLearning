@@ -213,7 +213,8 @@ class configuration:
 
         else: # You should modify the below codes appropriately.
             try:
-                self.loaded_model = torch.load(self.model_file)
+                #self.loaded_model = torch.load(self.model_file)
+                self.loaded_model = []
                 _op_msg = "Inference mode" if self.args.inference_mode else "Normal Learning mode"
             except Exception as e:
                 _op_msg = "Operation of inference mode is impossible. \nThere are not saved model files"

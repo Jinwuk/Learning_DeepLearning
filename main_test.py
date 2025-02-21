@@ -57,7 +57,7 @@ if __name__ == "__main__":
     # ----------------------------------------------------------------
     c_data      = CelebA(conf_data=c_conf)
     c_oper      = operation_fn(conf_data=c_conf)
-    c_repo      = report_AutoEncoder(conf_data=c_conf, c_op=c_oper, figsize=(8, 8), alpha=0.8, s=3)
+    c_repo      = report_VAE_celeb_a(conf_data=c_conf, c_op=c_oper, figsize=(8, 8), alpha=0.8, s=3)
     # ----------------------------------------------------------------
     # 1. Network Setting
     # ----------------------------------------------------------------
@@ -80,10 +80,19 @@ if __name__ == "__main__":
     if c_conf.args.inference_mode :
         # Only evaluation processing (Verify)
         print("Evaluation begin")
-        train_loss_mse, train_loss_kl= c_oper.validate_vae_celeba(l_model=lc_model, dataloader=train_loader, l_loss_fn=vae_loss_fn)
-        test_loss_mse,  test_loss_kl = c_oper.validate_vae_celeba(l_model=lc_model, dataloader=test_loader, l_loss_fn=vae_loss_fn)
+        #train_loss_mse, train_loss_kl= c_oper.validate_vae_celeba(l_model=lc_model, dataloader=train_loader, l_loss_fn=vae_loss_fn)
+        #test_loss_mse,  test_loss_kl = c_oper.validate_vae_celeba(l_model=lc_model, dataloader=test_loader, l_loss_fn=vae_loss_fn)
+        #c_conf.pprint(f"Train/loss (MSE)  {train_loss_mse:.4f}  Test/loss (MSE)  {test_loss_mse:.4f}  Train/loss (KL)  {train_loss_kl:.4f}  Test/loss (KL)  {test_loss_kl:.4f}")
 
-        c_conf.pprint(f"Train/loss (MSE)  {train_loss_mse:.4f}  Test/loss (MSE)  {test_loss_mse:.4f}  Train/loss (KL)  {train_loss_kl:.4f}  Test/loss (KL)  {test_loss_kl:.4f}")
+        pretrained_model = torch.load(c_conf.model_file)
+        c_vae.load_state_dict(pretrained_model)
+        original_x, recons_x = c_oper.reconstruction_image_from_vae(model=c_vae, dataloader=test_loader)
+        c_repo.plot_reconstruction_image(original_x=original_x, recons_x=recons_x)
+        c_repo.plot_latent_space_distribution(model=c_vae)
+        generated_faces, [g_width, g_height]  = c_oper.generate_new_faces(model=c_vae)
+        c_repo.plot_new_faces_from_vae(generated_faces=generated_faces, width=g_width, height=g_height)
+        print("debugging")
+
     else:
         # 1. Normal AutoLearning processing
         for i in range(c_conf.epoch):
@@ -100,10 +109,9 @@ if __name__ == "__main__":
     _msg  = f"\n{__name__} : Save graphics mode. Please wait\n" if c_conf.args.save_graphic else f"\n{__name__} : Please Check Window\n"
     print(g_line + _msg + g_line)
     # ----------------------------------------------------------------
-    # Generate embs and samples
-    c_repo_vae = report_VAE_celeb_a(conf_data=c_conf, c_op=c_oper)
-    c_repo_vae()
-    
+    # Generate samples
+    c_repo(model=c_vae, data_loader=test_loader)
+
     #l_embs, l_samples = c_repo(model=c_vae, test_loader=test_loader)
     #c_repo_vae  = report_VAE(conf_data=c_conf, c_op=c_oper, rep_ae=c_repo)
     #c_repo_vae.plot_embs_distribution(l_embs = l_embs)

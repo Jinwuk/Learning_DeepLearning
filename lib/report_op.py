@@ -179,12 +179,68 @@ class report_VAE:
 # ----------------------------------------------------------------
 # For the report of VAE_for_celeb_A
 # ----------------------------------------------------------------
+from scipy.stats import norm
 class report_VAE_celeb_a(report_AutoEncoder):
     def __init__(self,conf_data, c_op, **kwargs):
-        super().__init__(conf_data=conf_data, c_op=c_op, kwargs=kwargs)
-
-    def __call__(self, model, test_loader, _mode=1):
+        super().__init__(conf_data, c_op, **kwargs)
+    def __call__(self, model, data_loader, _mode=1):
         # 1. Save Learned model
-        torch.save(model.state_dict(), self.c_conf.model_file)
+        if self.c_conf.args.inference_mode : pass
+        else : torch.save(model.state_dict(), self.c_conf.model_file)
 
         DBG.dbg("Debug proc")
+
+    def plot_reconstruction_image(self, original_x, recons_x, num_plots = 5):
+        fig, axes = plt.subplots(1, num_plots, figsize=(15, 3))
+        rand_idcs = np.random.choice(128, size=num_plots, replace=True)
+
+        for i in range(num_plots):
+            axes[i].imshow(original_x[rand_idcs[i]].clamp(0, 1))
+            axes[i].axis('off')
+        self.plt_show_method()
+
+        fig, axes = plt.subplots(1, num_plots, figsize=(15, 3))
+        for i in range(num_plots):
+            axes[i].imshow(recons_x[rand_idcs[i]])
+            axes[i].axis('off')
+
+        self.plt_show_method()
+        #plt.show()
+
+    def plot_latent_space_distribution(self, model):
+        num_rows = 5
+        num_cols = 10
+
+        # Get embeddings
+        with torch.no_grad():
+            mean, logvar = model.encoder(self.c_op.recons_batch)
+            z = model.reparameterize(mean, logvar)
+            z = z.detach().cpu().numpy()
+
+        x = np.linspace(-3, 3, 100)
+        fig, axes = plt.subplots(nrows=num_rows, ncols=num_cols, figsize=(20, 6))
+        fig.subplots_adjust(hspace=0.6)
+
+        for row in range(num_rows):
+            for col in range(num_cols):
+                ax = axes[row, col]
+                ax.hist(z[:, row * col + col], density=True, bins=20)
+                ax.plot(x, norm.pdf(x))
+                ax.axis('off')
+                ax.set_title(row * col + col)
+
+        self.plt_show_method()
+
+    def plot_new_faces_from_vae(self, generated_faces, **kwargs):
+        grid_width = kwargs['width']
+        grid_height= kwargs['height']
+
+        fig = plt.figure(figsize=(16, 5))
+        fig.subplots_adjust(hspace=0.1, wspace=0.1)
+
+        for i in range(grid_width * grid_height):
+            ax = fig.add_subplot(grid_height, grid_width, i + 1)
+            ax.axis('off')
+            ax.imshow(generated_faces[i].numpy())
+
+        plt.show()

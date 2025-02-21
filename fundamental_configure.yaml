@@ -1,6 +1,6 @@
 OP_SPEC:
   EMBEDDING_DIM: 200     #Dimension of Latents Vector
-  EPOCHS: 15
+  EPOCHS: 1
   BUFFER_SIZE: 1000
   VALIDATION_SPLIT: 0.2
   KLDIVWEIGHT: 1.2

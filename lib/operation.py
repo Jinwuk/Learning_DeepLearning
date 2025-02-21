@@ -33,6 +33,8 @@ class operation_fn:
         self.sample_classinfo= {}
         # Loss function
         self.kl_divergence_weight= conf_data.kl_divergence_weight
+        # VAE for celebA
+        self.recons_batch   = None
     # ----------------------------------------------------
     # Train/Validate AE
     # ----------------------------------------------------
@@ -281,6 +283,30 @@ class operation_fn:
             print('model compiled')
         else: pass
         return model
+
+    def reconstruction_image_from_vae(self, model, dataloader):
+        print("Reconstruction_image_from_vae.")
+        self.recons_batch = next(iter(dataloader))
+        self.recons_batch = self.recons_batch.to(self.c_config.device)
+
+        model.eval()
+        with torch.no_grad():
+            recons_x, mean, logvar = model(self.recons_batch)
+
+        original_x  = self.recons_batch.detach().cpu().permute(0, 2, 3, 1)
+        recons_x    = recons_x.detach().cpu().permute(0, 2, 3, 1)
+        return original_x, recons_x
+
+    def generate_new_faces(self, model):
+        # randomly sample embeddings
+        grid_width, grid_height = (10, 3)
+
+        with torch.no_grad():
+            embeddings = torch.randn(size=(grid_width * grid_height, self.c_config.embedding_dim), device=self.c_config.device)
+            generated_faces = model.decoder(embeddings)
+
+        generated_faces = generated_faces.detach().cpu().permute(0, 2, 3, 1)
+        return generated_faces, [grid_width, grid_height]
 
     #----------------------------------------------------
     # Generate Images
