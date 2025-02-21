@@ -32,6 +32,7 @@ from lib.operation import operation_fn
 from lib.report_op import report_AutoEncoder
 from lib.report_op import report_Classfier_for_AutoEncoder
 from lib.report_op import report_VAE
+from lib.report_op import report_VAE_celeb_a
 import lib.processing as proc
 
 import torch
@@ -78,6 +79,7 @@ if __name__ == "__main__":
     start_time = time.time()
     if c_conf.args.inference_mode :
         # Only evaluation processing (Verify)
+        print("Evaluation begin")
         train_loss_mse, train_loss_kl= c_oper.validate_vae_celeba(l_model=lc_model, dataloader=train_loader, l_loss_fn=vae_loss_fn)
         test_loss_mse,  test_loss_kl = c_oper.validate_vae_celeba(l_model=lc_model, dataloader=test_loader, l_loss_fn=vae_loss_fn)
 
@@ -99,9 +101,12 @@ if __name__ == "__main__":
     print(g_line + _msg + g_line)
     # ----------------------------------------------------------------
     # Generate embs and samples
-    l_embs, l_samples = c_repo(model=c_vae, test_loader=test_loader)
-    c_repo_vae  = report_VAE(conf_data=c_conf, c_op=c_oper, rep_ae=c_repo)
-    c_repo_vae.plot_embs_distribution(l_embs = l_embs)
+    c_repo_vae = report_VAE_celeb_a(conf_data=c_conf, c_op=c_oper)
+    c_repo_vae()
+    
+    #l_embs, l_samples = c_repo(model=c_vae, test_loader=test_loader)
+    #c_repo_vae  = report_VAE(conf_data=c_conf, c_op=c_oper, rep_ae=c_repo)
+    #c_repo_vae.plot_embs_distribution(l_embs = l_embs)
     c_conf.write_txt_result()
 
     print("===================================================")

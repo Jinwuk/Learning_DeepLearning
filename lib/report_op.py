@@ -186,3 +186,5 @@ class report_VAE_celeb_a(report_AutoEncoder):
     def __call__(self, model, test_loader, _mode=1):
         # 1. Save Learned model
         torch.save(model.state_dict(), self.c_conf.model_file)
+
+        DBG.dbg("Debug proc")

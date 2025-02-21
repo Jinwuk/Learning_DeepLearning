@@ -17,7 +17,6 @@ NETWORK_PARAMS:
   LAYERS: 3
   STRIDE: 2
   BLOCKS: 5
-  Z_DIMENSION: 256          # Number of Mean and Log_variance Dimension for Decoder
 LEARNING_PARAMS:
   OPTIMIZER: Adam
   LEARNING_RATE: 1e-3
@@ -25,7 +24,7 @@ LEARNING_PARAMS:
 EXPERIMENT_PARAM:
   SummaryWriterPATH: runs
   TEST_SAMPLES: 5000
-  MODEL_FILE: vae_celeb_model.pth
+  MODEL_FILE: vae_celeb_model.pth 
   SUMMARYTXT: summary_text.txt
   TEXTWRITEMODE: w
   FLOAT_PRECISION: high

@@ -52,11 +52,13 @@ class Encoder(nn.Module):
             DBG.dbg("This kernel : %d" %_kernel_size)
             DBG.dbg("Process Terminated!!")
             exit(0)
+        # To calculate the z_dimension which is the final dimension before mean and logvar : 64x(2x2) _z_dim=2
+        _z_dim      = c_config.image_size/pow(2, _num_blocks)
         #----------------------------------------------------------------
         # Model Description
         #----------------------------------------------------------------
         self.latents = c_config.embedding_dim
-        self.z_dimension = c_config.fundamental_config['NETWORK_PARAMS']['Z_DIMENSION']
+        self.z_dimension = int(_features * (_z_dim * _z_dim))
         self.conv_module = nn.ModuleList()
 
         # Adding convolutional blocks to the module list
@@ -124,11 +126,14 @@ class Decoder(nn.Module):
             DBG.dbg("This kernel : %d" %_kernel_size)
             DBG.dbg("Process Terminated!!")
             exit(0)
+
+        # To calculate the z_dimension which is the final dimension before mean and logvar : 64x(2x2) _z_dim=2
+        _z_dim = c_config.image_size / pow(2, _num_blocks)
         #----------------------------------------------------------------
         # Model Description
         #----------------------------------------------------------------
         self.latents = c_config.embedding_dim
-        self.z_dimension = c_config.fundamental_config['NETWORK_PARAMS']['Z_DIMENSION']
+        self.z_dimension = int(_features * (_z_dim * _z_dim))
         self.features= _features
 
         self.fc = nn.Sequential(

@@ -182,6 +182,7 @@ class configuration:
                 self.args.inference_mode = False
             print(_op_msg + "\n" + g_line)
         elif self.args.processing_mode == 2:
+            # Auto_Encoder + Classifier
             try:
                 self.loaded_model   = torch.load(self.model_file)
             except Exception as e:
@@ -199,10 +200,20 @@ class configuration:
                 _op_msg += f"\n Error : {e}"
                 print(_op_msg + "\n" + g_line)
                 self.args.inference_mode = False
+        elif self.args.processing_mode == 3:
+            # VAE for Fashion MNIST
+            try:
+                self.loaded_model = torch.load(self.model_file)
+                _op_msg = "Inference mode" if self.args.inference_mode else "Normal Learning mode"
+            except Exception as e:
+                _op_msg = "Operation of inference mode is impossible. \nThere are not saved model files"
+                _op_msg += f"\n Error : {e}"
+                self.args.inference_mode = False
+            print(_op_msg + "\n" + g_line)
+
         else: # You should modify the below codes appropriately.
             try:
                 self.loaded_model = torch.load(self.model_file)
-                self.loaded_cf_model = torch.load(self.model_file_classfier)
                 _op_msg = "Inference mode" if self.args.inference_mode else "Normal Learning mode"
             except Exception as e:
                 _op_msg = "Operation of inference mode is impossible. \nThere are not saved model files"
