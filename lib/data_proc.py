@@ -23,7 +23,7 @@ import torchvision.transforms as Transforms
 import os
 import time
 from PIL import Image
-
+from matplotlib import pyplot as plt
 import interface_function as IF
 import my_debug as DBG
 
@@ -95,15 +95,14 @@ class CelebA(Dataset):
                  Transforms.ToTensor(),
         ])
 
-    def get_dataloaders(self):
-        print("Load CelebA Data\n")
+    def get_dataloaders(self, _confirm_data=False):
+        print("Load CelebA Data")
         _train_set_ratio = float(self.c_conf.train_set_ratio)
         _test_set_ratio  = 1.0 - _train_set_ratio
         train_ds, test_ds = random_split(self, [_train_set_ratio, _test_set_ratio])
         print('Train data size: {}'.format(len(train_ds)))
         print('Test data size : {}'.format(len(test_ds)))
-        print(g_line)
-
+        print("Data Loading")
         train_loader = DataLoader(dataset=train_ds, batch_size=self.c_conf.batch_size,
                                   shuffle=True, num_workers=self.c_conf.num_workers, pin_memory=True)
         test_loader = DataLoader(dataset=test_ds, batch_size=self.c_conf.batch_size,
@@ -112,9 +111,25 @@ class CelebA(Dataset):
         self.data_shape = next(iter(train_loader))[0].shape
         # Set data classes
         #self.c_conf.set_data_label(l_label=train_ds.classes)
+        self.check_data_set(check_ds=train_loader, _active=_confirm_data)
 
+        print(f"Data Shape     : {self.data_shape}")
+        print(g_line)
         return train_loader, test_loader
 
+    def check_data_set(self, check_ds, _active=False):
+        if _active == False : return
+        check_samples = next(iter(check_ds))
+        print(f"Sample Dimension : {check_samples.shape}\n" + g_line)
+
+        plt.figure(figsize=(14, 3))
+        for i in range(5):
+            ax = plt.subplot(1, 5, i + 1)
+            img = check_samples[i].permute(1, 2, 0).clamp(0.0, 1.0)
+            ax.imshow(img)
+            ax.axis('off')
+
+        plt.show()
 # =================================================================
 # Main Routine
 # =================================================================

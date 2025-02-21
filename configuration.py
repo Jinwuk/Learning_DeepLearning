@@ -48,11 +48,13 @@ class configuration:
         self.buffer_size        = self.fundamental_config['OP_SPEC']['BUFFER_SIZE']
         self.validation_split   = self.fundamental_config['OP_SPEC']['VALIDATION_SPLIT']
         self.kl_divergence_weight=float(self.fundamental_config['OP_SPEC']['KLDIVWEIGHT'])
-
+        # For VAE celeb-A test and higher
         try:
             self.data_dir           = self.set_path_from_str(_path_str=self.fundamental_config['DATASPEC']['DATA_DIR'])
             self.data_folder        = self.fundamental_config['DATASPEC']['DATA_FOLDER']
             self.train_set_ratio    = self.fundamental_config['DATASPEC']['TRAINSET_RATIO']
+            self.float_precision    = self.fundamental_config['EXPERIMENT_PARAM']['FLOAT_PRECISION']
+            self.torch_compile      = self.fundamental_config['EXPERIMENT_PARAM']['TORCH_COMPILE']
         except Exception as e:
             pass
 
@@ -60,9 +62,10 @@ class configuration:
         self.channels           = self.fundamental_config['DATASPEC']['CHANNELS']
         self.batch_size         = self.fundamental_config['DATASPEC']['BATCH_SIZE']
         # For CUDA setting
-        torch.cuda.set_device(self.args.gpu_id)
         self.fundamental_config['DEVICE'] = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.device             = self.fundamental_config['DEVICE']
+        if self.device == 'cuda': torch.cuda.set_device(self.args.gpu_id)
+        else: pass
         # Additional Model
         self.hidden_lyr         = self.fundamental_config['CLASSIFIER']['HIDDEN']
         self.model_file_classfier = self.fundamental_config['CLASSIFIER']['MODEL_FILE']

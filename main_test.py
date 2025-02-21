@@ -61,13 +61,7 @@ if __name__ == "__main__":
     # 1. Network Setting
     # ----------------------------------------------------------------
     c_vae = VAE_4_CELEBA(c_config=c_conf).to(c_conf.device)
-    if torch.__version__.split('.')[0] == '2':
-        torch.set_float32_matmul_precision('high')
-        # It is important to use eager backend here to avoid
-        # distribution mismatch in training and predicting
-        c_vae = torch.compile(c_vae, backend="eager")
-        print('model compiled')
-    else: pass
+    c_vae = c_oper.set_performace_optimization(c_vae)
     c_vae.print_summary(_shape=(c_conf.channels, c_conf.image_size, c_conf.image_size), _quite=c_conf.args.quite_mode)
     # Model Setting
     vae_loss_fn, vae_optimizer = c_conf(model=c_vae)

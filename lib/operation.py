@@ -271,7 +271,16 @@ class operation_fn:
             torch.cuda.empty_cache()
 
         return running_mse_loss / len(dataloader), running_kl_loss / len(dataloader)
-
+    # Performace Optimization for pytorch > 2.0
+    def set_performace_optimization(self, model):
+        if torch.__version__.split('.')[0] == '2':
+            torch.set_float32_matmul_precision(self.c_config.float_precision)
+            # It is important to use eager backend here to avoid
+            # distribution mismatch in training and predicting
+            c_vae = torch.compile(model, backend=self.c_config.torch_compile)
+            print('model compiled')
+        else: pass
+        return model
 
     #----------------------------------------------------
     # Generate Images
